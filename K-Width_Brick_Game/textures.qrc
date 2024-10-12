@@ -1,0 +1,6 @@
+<RCC>
+    <qresource prefix="/">
+        <file>resources/textures/background.png</file>
+        <file>resources/textures/tiles.png</file>
+    </qresource>
+</RCC>
