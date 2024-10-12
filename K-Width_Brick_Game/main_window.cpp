@@ -4,6 +4,8 @@
 #include <QPixMap>
 #include <QGraphicsPixmapItem>
 
+#include <brick.h>
+
 main_window::main_window(QWidget *parent)
     : QMainWindow(parent)
 {
@@ -35,6 +37,10 @@ void main_window::on_testGameButton_clicked() {
         background_image_item->setScale(1);
         
         game_scene->addItem(background_image_item);
+
+        brick *brick_shape = new brick(tile_size);
+
+        game_scene->addItem(brick_shape);
 
         game_view->show();
         game_view->setFixedSize(game_window_width, game_window_height);
