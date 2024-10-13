@@ -1,11 +1,13 @@
 #pragma once
 #include <QGraphicsItemGroup>
+#include <QKeyEvent>
 
 class brick : public QGraphicsItemGroup
 {
 public:
 	int tile_size;
-	const int shapes[7][4] = {
+    int color;
+    const int shapes[7][4] = {
         1,3,5,7, // I
         2,4,5,7, // Z
         3,5,4,6, // S
@@ -19,8 +21,9 @@ public:
         int x, y;
     } coordinates[4];
 
-	brick(int t_s);
+	brick(int t_s, int c);
 
 	void draw();
+    void keyPressEvent(QKeyEvent* k);
 };
 

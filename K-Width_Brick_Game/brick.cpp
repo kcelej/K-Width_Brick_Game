@@ -3,15 +3,17 @@
 #include <QGraphicsPixmapItem>
 #include <QRect>
 
-brick::brick(int t_s) : tile_size(t_s) {
+brick::brick(int t_s, int c) : tile_size(t_s), color(c) {
 	draw();
+
+	this->setFlag(QGraphicsItem::ItemIsFocusable, 1);
+	this->setFocus();
 }
 
 void brick::draw() {
 	QPixmap tileset(":/resources/textures/tiles.png");
-	int color = 2;
 
-	QRect rectangle(2*tile_size, 0, tile_size, tile_size);
+	QRect rectangle(color*tile_size, 0, tile_size, tile_size);
 	QPixmap cutTexture;
 
 	cutTexture = tileset.copy(rectangle);
@@ -29,7 +31,36 @@ void brick::draw() {
 		square->setPos(coordinates[i].x*tile_size, coordinates[i].y*tile_size);
 
 		this->addToGroup(square);
-	}
-	
 
+		if (i == 1) {
+			this->setTransformOriginPoint(coordinates[i].x * tile_size, coordinates[i].y * tile_size);
+		}
+		
+	}
+
+	//this->setRotation(90);
+
+}
+
+
+void brick::keyPressEvent(QKeyEvent* k) {
+	switch (k->key()) {
+		case Qt::Key_Left:
+			// move the brick left by one tile
+			
+			setX(x() - tile_size);
+			break;
+		case Qt::Key_Right:
+			// move the brick right by one tile
+			setX(x() + tile_size);
+			break;
+		//case Qt::Key_Down:
+		//	// move the brick down by one tile
+		//	// tbd
+		//	break;
+		//case Qt::Key_Up:
+		//	// instantly move brick to the bottom
+		//	// tbd
+		//	break;
+	}
 }

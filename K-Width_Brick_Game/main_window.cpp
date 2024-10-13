@@ -38,7 +38,7 @@ void main_window::on_testGameButton_clicked() {
         
         game_scene->addItem(background_image_item);
 
-        brick *brick_shape = new brick(tile_size);
+        brick *brick_shape = new brick(tile_size, 3);
 
         game_scene->addItem(brick_shape);
 
