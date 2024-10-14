@@ -27,18 +27,25 @@ const int game_window_height = 480;
 const int tile_size = 18;
 
 bool checkCollision(brick* brick_shape, QGraphicsScene* scene) {
-    QRectF brickBoundingBox = brick_shape->boundingRect(); // Get brick's bounding box
-    QPointF brickBottomPosition = brick_shape->pos() + brickBoundingBox.bottomLeft(); // Get bottom left point in scene coords
+    // Iterate over each of the brick's four tiles
+    for (int i = 0; i < 4; i++) {
+        // Map each tile's local coordinates to scene coordinates
+        QPointF tileScenePos = brick_shape->mapToScene(
+            brick_shape->coordinates[i].x * brick_shape->tile_size,
+            brick_shape->coordinates[i].y * brick_shape->tile_size
+        );
 
-    // Bottom boundary collision
-    if (brickBottomPosition.y() + tile_size >= 390) {  // Ensure it's within tile size of 390 (doesnt work)
-        return true;  // Collision at the bottom.
+        // Check if the tile is at or below the bottom boundary (y = 390)
+        if (tileScenePos.y() + brick_shape->tile_size >= 390) {
+            return true;  // Collision at the bottom of the game field
+        }
     }
 
-    // To be done: You can also add collision with other blocks here.
-
+    // No collision detected
     return false;
 }
+
+
 
 void main_window::on_testGameButton_clicked() {
     try {
@@ -76,18 +83,19 @@ void main_window::on_testGameButton_clicked() {
         connect(timer, &QTimer::timeout, this, [brick_shape, game_scene, timer]() {
             // Check if the brick collides with the bottom or other blocks
             if (!checkCollision(brick_shape, game_scene)) {
-                brick_shape->setY(brick_shape->y() + tile_size);  // Move down by one tile
+                brick_shape->setY(brick_shape->y() + brick_shape->tile_size);  // Move down by one tile
             }
             else {
                 timer->stop();  // Stop the timer when the brick collides with the bottom or other bricks
 
-                // To be done, handle the brick landing:
-                // 1. Lock the brick in place (kind of works but stops in the wrong place)
+                // To be done:
+                // 1. Lock the brick in place (this happens implicitly)
                 // 2. Check for full lines and clear them if needed
                 // 3. Spawn a new brick
             }
             });
-        timer->start(1000); 
+        timer->start(1000);  // Move brick down every second
+
     }
     catch (...) {
         QMessageBox::information(this, "Error", "Error during game test");
