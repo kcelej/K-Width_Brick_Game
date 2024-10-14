@@ -25,5 +25,7 @@ public:
 
 	void draw();
     void keyPressEvent(QKeyEvent* k);
+    void adjustAfterRotation();
+
 };
 
