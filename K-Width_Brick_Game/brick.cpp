@@ -44,6 +44,8 @@ void brick::draw() {
 
 
 void brick::keyPressEvent(QKeyEvent* k) {
+	qDebug() << "Key Pressed: " << k->key();  // Debug message to ensure key press is detected.
+
 	switch (k->key()) {
 		case Qt::Key_Left:
 			// move the brick left by one tile
