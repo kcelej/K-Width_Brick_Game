@@ -92,18 +92,20 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClCompile Include="tile.cpp" />
     <QtRcc Include="main_window.qrc" />
     <QtRcc Include="textures.qrc" />
     <QtUic Include="main_window.ui" />
     <QtMoc Include="main_window.h" />
-    <ClCompile Include="brick.cpp" />
+    <ClCompile Include="board.cpp" />
     <ClCompile Include="main_window.cpp" />
     <ClCompile Include="main.cpp" />
     <None Include="K-Width_Brick_Game.ico" />
     <ResourceCompile Include="K-Width_Brick_Game.rc" />
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="brick.h" />
+    <ClInclude Include="board.h" />
+    <ClInclude Include="tile.h" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Condition="Exists('$(QtMsBuild)\qt.targets')">

@@ -15,5 +15,5 @@ private:
     Ui::main_windowClass ui;
 
 private slots:
-    void on_testGameButton_clicked();   // Launch the game for testing purposes
+    void on_testGameButton_clicked();
 };
