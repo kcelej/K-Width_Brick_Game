@@ -16,5 +16,7 @@ public:
 	tile(int x, int y);
 
 	QGraphicsPixmapItem* getPtr();
+	bool getIsOccupied();
+	void changeTileStatus(bool b);
 };
 
