@@ -34,7 +34,7 @@ bool tile::getIsOccupied() {
 
 void tile::changeTileStatus(bool b) {
 	if (this->ptr != nullptr) {
-		this->isOccupied = b;
+		isOccupied = b;
 	}
 	else {
 		qWarning("Attempting to modify a null tile.");

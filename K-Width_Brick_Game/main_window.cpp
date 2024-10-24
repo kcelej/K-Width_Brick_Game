@@ -52,7 +52,8 @@ void main_window::on_testGameButton_clicked() {
 
 
         // example brick for testing
-        brick* player = new brick(random(0,6), random(0,6));
+        brick* player = new brick(random(0, 6), 5);
+            //random(0,6));
 
 
         // example position for testing
@@ -75,12 +76,49 @@ void main_window::on_testGameButton_clicked() {
         player->draw(gameBoard);
 
         // example movement downwards for testing
-        for (int i = 0; i < 3; i++) {
-            for (int j = 0; j < 8; j++) {
-                gameBoard->resetTile(player->coordinates[j].i, player->coordinates[j].j);   // changes the tiles to default texture
-                player->coordinates[j].i++; // lowers the brick by one tile
+        for (int i = 0; i < 30; i++) {
+            if (player->collision(gameBoard, 0) != 1) {
+                for (int j = 0; j < 8; j++) {
+                        gameBoard->resetTile(player->coordinates[j].i, player->coordinates[j].j);   // changes the tiles to default texture
+                        player->coordinates[j].i++; // lowers the brick by one tile
+                }
+                player->draw(gameBoard);    // changes the game board tiles to the brick shape
             }
-            player->draw(gameBoard);    // changes the game board tiles to the brick shape
+            
+        }
+        brick* player1 = new brick(random(0, 6), 0);
+        //random(0,6));
+
+
+    // example position for testing
+        player1->coordinates[0].i = 0;
+        player1->coordinates[0].j = 4;
+        player1->coordinates[1].i = 0;
+        player1->coordinates[1].j = 5;
+        player1->coordinates[2].i = 1;
+        player1->coordinates[2].j = 4;
+        player1->coordinates[3].i = 1;
+        player1->coordinates[3].j = 5;
+        player1->coordinates[4].i = 2;
+        player1->coordinates[4].j = 4;
+        player1->coordinates[5].i = 2;
+        player1->coordinates[5].j = 5;
+        player1->coordinates[6].i = 3;
+        player1->coordinates[6].j = 4;
+        player1->coordinates[7].i = 3;
+        player1->coordinates[7].j = 5;
+        player1->draw(gameBoard);
+
+        // example movement downwards for testing
+        for (int i = 0; i < 30; i++) {
+            if (player1->collision(gameBoard, 0) != 1) {
+                for (int j = 0; j < 8; j++) {
+                    gameBoard->resetTile(player1->coordinates[j].i, player1->coordinates[j].j);   // changes the tiles to default texture
+                    player1->coordinates[j].i++; // lowers the brick by one tile
+                }
+                player1->draw(gameBoard);    // changes the game board tiles to the brick shape
+            }
+
         }
 
     }

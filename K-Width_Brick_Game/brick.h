@@ -26,26 +26,26 @@ public:
 		 	 0,0,
 			 1,1,
 			 1,1},	// O
-			{0,0,
-			 0,1,
-			 0,1,
-			 1,1},	// J
 				{0,0,
-				 1,0,
-				 1,0,
-				 1,1},	// L
+				 0,1,
+				 0,1,
+				 1,1},	// J
 					{0,0,
 					 1,0,
-					 1,1,
-					 0,1},	// S
+					 1,0,
+					 1,1},	// L
 						{0,0,
-						 0,1,
+						 1,0,
 						 1,1,
-						 0,1},	// T
+						 0,1},	// S
 							{0,0,
 							 0,1,
 							 1,1,
-							 1,0}	// Z
+							 0,1},	// T
+								{0,0,
+								 0,1,
+								 1,1,
+								 1,0}	// Z
 	};
 
 	int colour;	// sprite's colour
@@ -55,5 +55,6 @@ public:
 	brick(int col, int sh);
 
 	void draw(board* b);
+	bool collision(board* b, int direction);	// directions: 0 - down, 1 - left, 2 - right
 };
 
