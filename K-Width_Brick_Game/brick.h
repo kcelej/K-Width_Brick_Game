@@ -56,5 +56,6 @@ public:
 
 	void draw(board* b);
 	bool collision(board* b, int direction);	// directions: 0 - down, 1 - left, 2 - right
+	bool collision_down(board* b, int rotation, int min, int max); 
 };
 
