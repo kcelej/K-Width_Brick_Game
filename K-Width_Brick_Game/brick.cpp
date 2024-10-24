@@ -32,7 +32,7 @@ void brick::draw(board* b) {
 }
 
 
-bool brick::collision(board* b, int direction) {	// directions: 0 - down, 1 - left, 2 - right
+bool brick::collision(board* b, int direction) {	// direction of falling: 0 - down, 1 - left, 2 - right
 	if (direction == 1) {
 
 	}
@@ -54,6 +54,15 @@ bool brick::collision(board* b, int direction) {	// directions: 0 - down, 1 - le
 					return 1;
 				}
 			}
-		}	
+		}
+		else if (rotation == 1) {
+
+		}
+		else if (rotation == 2) {
+
+		}
+		else {	// rotation == 3
+
+		}
 	}
 }
