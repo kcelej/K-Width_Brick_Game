@@ -52,8 +52,8 @@ void main_window::on_testGameButton_clicked() {
 
 
         // example brick for testing
-        brick* player = new brick(random(0, 6), 5);
-            //random(0,6));
+       //brick* player = new brick(random(0, 6), 3);
+        brick* player = new brick(random(0, 6), random(0, 6));
 
 
         // example position for testing
@@ -75,6 +75,7 @@ void main_window::on_testGameButton_clicked() {
         player->coordinates[7].j = 5;
         player->draw(gameBoard);
 
+
         // example movement downwards for testing
         for (int i = 0; i < 30; i++) {
             if (player->collision(gameBoard, 0) != 1) {
@@ -86,9 +87,8 @@ void main_window::on_testGameButton_clicked() {
             }
             
         }
-        brick* player1 = new brick(random(0, 6), 0);
-        //random(0,6));
-
+        //brick* player1 = new brick(random(0, 6), 5);
+        brick* player1 = new brick(random(0, 6), random(0, 6));
 
     // example position for testing
         player1->coordinates[0].i = 0;

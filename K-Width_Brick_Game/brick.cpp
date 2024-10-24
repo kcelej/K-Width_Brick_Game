@@ -23,8 +23,8 @@ void brick::draw(board* b) {
 	else if (rotation == 1) {
 
 	}
-	else if (rotation == 2) {
-		
+	if (rotation == 2) { // 180 degrees
+
 	}
 	else {	// rotation == 3
 
@@ -41,27 +41,66 @@ bool brick::collision(board* b, int direction) {	// direction of falling: 0 - do
 	}
 	else {	// direction == 0
 		if (rotation == 0) {
-			if (shapes[shape][6] == 1 || shapes[shape][7] == 1) {
-				if (coordinates[6].i + 1 < 20 && coordinates[7].i + 1 < 20) {
-					if ((b->gameArea[coordinates[6].i + 1][coordinates[6].j]->getIsOccupied() == 1) && (b->gameArea[coordinates[7].i + 1][coordinates[7].j]->getIsOccupied() == 1)) {
-						return 1;
+			// Loop through indices 6 and 7 to check the corresponding shapes and coordinates
+			for (int i = 6; i <= 7; i++) {
+				int k = i;
+				// Check until reaching a relevant index (0 or 1)
+				while (k >= i - 6) {
+					// Check if the shape at the current index has a value of 1
+					if (shapes[shape][k] == 1) {
+						// Ensure that the next row (i + 1) is within the game area boundary
+						if (coordinates[k].i + 1 < 20) { //bottom edge
+							// Check if the position in the next row is occupied
+							if (b->gameArea[coordinates[k].i + 1][coordinates[k].j]->getIsOccupied() == 1) {
+								// Return 1 if the position is occupied (collision detected)
+								return 1;
+							}
+						}
+						else {
+							return 1;
+						}
+						// Exit the loop if a block is found and no collision detected
+						break;
 					}
-					else {
-						return 0;
-					}
-				}
-				else {
-					return 1;
+					k -= 2; // Skip to the next relevant index if no block at current index
 				}
 			}
+			// If no collision is detected, return 0 (no collision)
+			return 0;
 		}
-		else if (rotation == 1) {
-
+		else if (rotation == 1) { //90deg
 		}
-		else if (rotation == 2) {
-
+		else if (rotation == 2) { // 180 degrees rotation
+			if (rotation == 0) {
+				// Loop through indices 0 and 1 to check the corresponding shapes and coordinates
+				for (int i = 0; i <= 1; i++) {
+					int k = i;
+					// Check until reaching a relevant index (6 or 7)
+					while (k <= i + 6) {
+						// Check if the shape at the current index has a value of 1
+						if (shapes[shape][k] == 1) {
+							// Ensure that the next row (i + 1) is within the game area boundary
+							if (coordinates[k].i + 1 < 20) { //bottom edge
+								// Check if the position in the next row is occupied
+								if (b->gameArea[coordinates[k].i + 1][coordinates[k].j]->getIsOccupied() == 1) {
+									// Return 1 if the position is occupied (collision detected)
+									return 1;
+								}
+							}
+							else {
+								return 1;
+							}
+							// Exit the loop if a block is found and no collision detected
+							break;
+						}
+						k += 2; // Skip to the next relevant index if no block at current index
+					}
+				}
+				// If no collision is detected, return 0 (no collision)
+				return 0;
+			}
 		}
-		else {	// rotation == 3
+		else {	// rotation == 3, 270deg
 
 		}
 	}
