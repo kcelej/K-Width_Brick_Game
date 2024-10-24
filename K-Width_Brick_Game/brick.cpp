@@ -33,7 +33,6 @@ void brick::draw(board* b) {
 
 
 bool brick::collision(board* b, int direction) {	// directions: 0 - down, 1 - left, 2 - right
-	bool collision = 0;
 	if (direction == 1) {
 
 	}
