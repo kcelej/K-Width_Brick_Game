@@ -11,6 +11,18 @@ brick::brick(int col, int sh) : colour(col), shape(sh), rotation(0) {
 
 void brick::draw(board* b) {
 	if (rotation == 0) {
+		/*
+		basic idea
+		from
+		[1][3][5][7]
+		[0][2][4][6]
+
+		to
+		[0][1]
+		[2][3]
+		[4][5]
+		[6][7]
+		*/
 		for (int i = 0; i < 8; i++) {
 			if (shapes[shape][i] != 0) {
 				if (coordinates[i].i != -1 && coordinates[i].j != -1) {
@@ -29,11 +41,88 @@ void brick::draw(board* b) {
 			b->changeTile(nowy_y, nowy_x, this->colour);
 			b->changeTileStatus(nowy_y, nowy_x, 1);
 		}*/
+
+		//second idea, not working properly :)
+		//the point relative to which we will rotate the block, down right corner 
+		int corner_x = coordinates[7].j;
+		int corner_y = coordinates[7].i;
+
+		for (int i = 0; i < 8; i++) {
+			if (shapes[shape][i] != 0 && coordinates[i].i != -1 && coordinates[i].j != -1) {
+				int old_x = coordinates[i].j;
+				int old_y = coordinates[i].i;
+
+				//reset old position of the block
+				b->resetTile(coordinates[i].i, coordinates[i].j);
+
+				//rotate
+				int new_x = corner_x + (old_x - corner_y);
+				int new_y = corner_y + (old_y - corner_x);
+
+				//check collision 
+				//for now only border
+				if (0 <= new_x < 10 && 0 <= new_y < 20) {
+					coordinates[i].i = new_y;
+					coordinates[i].j = new_x;
+					b->changeTile(coordinates[i].i, coordinates[i].j, this->colour);
+					b->changeTileStatus(coordinates[i].i, coordinates[i].j, 1);
+				}
+				else return;
+			}
+		}
+
+		//third idea
+		/*
+		basic idea
+		from
+		[0][1]
+		[2][3]
+		[4][5]
+		[6][7]
+
+		to 
+		[6][4][2][0]
+		[7][5][3][1]
+		*/
+
+		//for (int i = 0; i < 8; i++) {
+		//	if (shapes[shape][i] != 0 && coordinates[i].i != -1 && coordinates[i].j != -1) {
+		//		//check for border collision
+		//		if (coordinates[6].i + 3 < 20) {
+
+		//		}
+
+		//	}
+		//}
 	}
 	if (rotation == 2) { // 180 degrees
+		/*
+		basic idea
+		from
+		[6][4][2][0]
+		[7][5][3][1]
+
+		to
+		[7][6]
+		[5][4]
+		[3][2]
+		[1][0]
+		*/
 
 	}
 	else {	// rotation == 3
+		/*
+		basic idea
+		from
+		[7][6]
+		[5][4]
+		[3][2]
+		[1][0]
+
+		to
+		[1][3][5][7]
+		[0][2][4][6]
+		*/
 
 	}
 }
