@@ -48,14 +48,43 @@ public:
 								 1,0}	// Z
 	};
 
+
+	brick(int col, int sh, board* _b);
+	~brick() { b = nullptr; }
+	void draw();
+
+	/*
+	* Method changes the value of the brick rotation field
+	* @param new_rotation new rotation we want to set
+	*/
+	void set_rotation(int new_rotation);
+
+	/*
+	* The collision method checks for potential collisions between a brick and other elements 
+	* on the game board when the brick moves in a specific direction.
+	* @param direction integer value that tells which way the block is moving
+	* @return Return true if collision detected, false otherwise 
+	*/
+	bool collision(int direction);	// directions: 0 - down, 1 - left, 2 - right
+
+	/*
+	* Checks collisions only with downward movement of block 
+	* @param min lower range to for loop
+	* @param max upper range to for loop
+	* @return Return true if collision detected, false otherwise 
+	*/
+	bool collision_down(int min, int max); 
+
+private:
 	int colour;	// sprite's colour
 	int shape; // sprite's shape
 	int rotation; // (all rotations are done clockwise): 0 - default, 1 - 90deg, 2 - 180deg, 3 - 270deg
+	board* b = nullptr; // pointer to board
 
-	brick(int col, int sh);
-
-	void draw(board* b);
-	bool collision(board* b, int direction);	// directions: 0 - down, 1 - left, 2 - right
-	bool collision_down(board* b, int rotation, int min, int max); 
+	/*
+	* Method checks possibility of changing brick rotation
+	* @return True if rotation is possible, otherwise false 
+	*/
+	bool rotate();
 };
 

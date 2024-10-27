@@ -1,15 +1,37 @@
 #include "brick.h"
 
 
-brick::brick(int col, int sh) : colour(col), shape(sh), rotation(0) {
+brick::brick(int col, int sh, board* _b) : colour(col), shape(sh), rotation(0), b(_b) {
 	for (int i = 0; i < 8; i++) {
 		coordinates[i].i = -1;
 		coordinates[i].j = -1;
 	}
 }
 
+void brick::draw() {
+	for (int i = 0; i < 8; i++) {
+		if (shapes[shape][i] != 0) {
+			if (coordinates[i].i != -1 || coordinates[i].j != -1) {
+				b->changeTile(coordinates[i].i, coordinates[i].j, this->colour);
+				//b->changeTileStatus(coordinates[i].i, coordinates[i].j, 1);
+			}
+		}
+	}
+}
 
-void brick::draw(board* b) {
+void brick::set_rotation(int new_rotation) {
+	int old_rotation = rotation;
+	rotation = new_rotation;
+	//if the rotation does not cause any collisions rotate
+	if (rotate()) return;
+	else {
+		//if yes then set the old rotation value
+		rotation = old_rotation;
+		return;
+	}
+}
+
+bool brick::rotate() {
 	if (rotation == 0) {
 		/*
 		basic idea
@@ -18,60 +40,36 @@ void brick::draw(board* b) {
 		[0][2][4][6]
 
 		to
-		[0][1]
-		[2][3]
-		[4][5]
-		[6][7]
+				[0][1]
+				[2][3]
+				[4][5]
+				[6][7]
 		*/
-		for (int i = 0; i < 8; i++) {
-			if (shapes[shape][i] != 0) {
-				if (coordinates[i].i != -1 && coordinates[i].j != -1) {
-					b->changeTile(coordinates[i].i, coordinates[i].j, this->colour);
-					b->changeTileStatus(coordinates[i].i, coordinates[i].j, 1);
-				}
+		//check if rotation can occur?
+		/*if () {
+			return 0;
+		}
+		else{*/
+
+		//rotate
+		for (int i = 6; i <= 7; ++i) {
+			int k = i;
+			//If we go odd line then take y coordinates from 7, if even then y coordinates 6
+			int y = coordinates[6].i;
+			//If we go odd line then take x coordinates from 6, if even then x coordinates 4
+			int x = coordinates[(i % 2) ? 6 : 4].j;
+			while (k >= i - 6) {
+				//x coordinates doesn't change only y
+				coordinates[k].i = y--;
+				coordinates[k].j = x;
+				k -= 2;
 			}
 		}
+		// Rotation possible and done, return true
+		return 1;
 	}
+
 	else if (rotation == 1) {
-		//basic idea
-		/*for (int i = 0; i < 8; i++) {
-			int nowy_x = coordinates[7].j - (coordinates[i].i - coordinates[7].i);
-			int nowy_y = coordinates[7].i + (coordinates[i].j - coordinates[7].j);
-
-			b->changeTile(nowy_y, nowy_x, this->colour);
-			b->changeTileStatus(nowy_y, nowy_x, 1);
-		}*/
-
-		//second idea, not working properly :)
-		//the point relative to which we will rotate the block, down right corner 
-		int corner_x = coordinates[7].j;
-		int corner_y = coordinates[7].i;
-
-		for (int i = 0; i < 8; i++) {
-			if (shapes[shape][i] != 0 && coordinates[i].i != -1 && coordinates[i].j != -1) {
-				int old_x = coordinates[i].j;
-				int old_y = coordinates[i].i;
-
-				//reset old position of the block
-				b->resetTile(coordinates[i].i, coordinates[i].j);
-
-				//rotate
-				int new_x = corner_x + (old_x - corner_y);
-				int new_y = corner_y + (old_y - corner_x);
-
-				//check collision 
-				//for now only border
-				if (0 <= new_x < 10 && 0 <= new_y < 20) {
-					coordinates[i].i = new_y;
-					coordinates[i].j = new_x;
-					b->changeTile(coordinates[i].i, coordinates[i].j, this->colour);
-					b->changeTileStatus(coordinates[i].i, coordinates[i].j, 1);
-				}
-				else return;
-			}
-		}
-
-		//third idea
 		/*
 		basic idea
 		from
@@ -85,16 +83,29 @@ void brick::draw(board* b) {
 		[7][5][3][1]
 		*/
 
-		//for (int i = 0; i < 8; i++) {
-		//	if (shapes[shape][i] != 0 && coordinates[i].i != -1 && coordinates[i].j != -1) {
-		//		//check for border collision
-		//		if (coordinates[6].i + 3 < 20) {
+		//check if free space is available?
+		/*if () {
+			return 0;
+		}
+		else{*/
 
-		//		}
+		for (int i = 6; i <= 7; ++i) {
+			int k = i;
+			//If we go odd column then take y coordinates from 6, if even then x coordinates 4
+			int y = coordinates[(i % 2) ? 7 : 4].i;
+			int x = coordinates[6].j;
+			while (k >= i - 6) {
+				//y coordinates doesn't change only x
+				coordinates[k].i = y;
+				coordinates[k].j = x++;
+				k -= 2;
+			}
+		}
 
-		//	}
-		//}
+		// Rotation possible and done, return true
+		return 1;
 	}
+
 	if (rotation == 2) { // 180 degrees
 		/*
 		basic idea
@@ -109,7 +120,29 @@ void brick::draw(board* b) {
 		[1][0]
 		*/
 
+		//check if rotation can occur?
+		/*if () {
+			return 0;
+		}
+		else{*/
+
+		for (int i = 6; i <= 7; ++i) {
+			int k = i;
+			//If we go odd column then take y coordinates from 6, if even then x coordinates 4
+			int y = coordinates[6].i;
+			int x = coordinates[(i % 2) ? 6: 4].j;
+			while (k >= i - 6) {
+				//x coordinates doesn't change only y
+				coordinates[k].i = y++;
+				coordinates[k].j = x;
+				k -= 2;
+			}
+		}
+
+		// Rotation possible and done, return true
+		return 1;
 	}
+
 	else {	// rotation == 3
 		/*
 		basic idea
@@ -124,11 +157,31 @@ void brick::draw(board* b) {
 		[0][2][4][6]
 		*/
 
+		//check if rotation can occur?
+		/*if () {
+			return 0;
+		}
+		else{*/
+
+		for (int i = 6; i <= 7; ++i) {
+			int k = i;
+			//If we go odd column then take y coordinates from 6, if even then x coordinates 4
+			int y = coordinates[6].i;
+			int x = coordinates[(i % 2) ? 6 : 4].j;
+			while (k >= i - 6) {
+				//y coordinates doesn't change only x
+				coordinates[k].i = y;
+				coordinates[k].j = x--;
+				k -= 2;
+			}
+		}
+		// Rotation possible and done, return true
+		return 1;
 	}
 }
 
 
-bool brick::collision(board* b, int direction) {	// direction of falling: 0 - down, 1 - left, 2 - right
+bool brick::collision(int direction) {	// direction of falling: 0 - down, 1 - left, 2 - right
 	if (direction == 1) {
 
 	}
@@ -166,7 +219,7 @@ bool brick::collision(board* b, int direction) {	// direction of falling: 0 - do
 			//return 0;
 
 			//Returns 1 if collision is detected, 0 if not
-			return collision_down(b, 0, 6, 7);
+			return collision_down(6, 7);
 		}
 
 		else if (rotation == 1) { //90deg
@@ -197,40 +250,38 @@ bool brick::collision(board* b, int direction) {	// direction of falling: 0 - do
 			// If no collision is detected, return 0 (no collision)
 			return 0;
 
-			//return collision_down(b, 1, 1, 7);
+			//return collision_down(1, 7);
 		}
 
 		else if (rotation == 2) { // 180 degrees rotation
-			if (rotation == 0) {
-				// Loop through indices 0 and 1 to check the corresponding shapes and coordinates
-				for (int i = 0; i <= 1; i++) {
-					int k = i;
-					// Check until reaching a relevant index (6 or 7)
-					while (k <= i + 6) {
-						// Check if the shape at the current index has a value of 1
-						if (shapes[shape][k] == 1) {
-							// Ensure that the next row (i + 1) is within the game area boundary
-							if (coordinates[k].i + 1 < 20) { //bottom edge
-								// Check if the position in the next row is occupied
-								if (b->gameArea[coordinates[k].i + 1][coordinates[k].j]->getIsOccupied() == 1) {
-									// Return 1 if the position is occupied (collision detected)
-									return 1;
-								}
-							}
-							else {
+			// Loop through indices 0 and 1 to check the corresponding shapes and coordinates
+			for (int i = 0; i <= 1; i++) {
+				int k = i;
+				// Check until reaching a relevant index (6 or 7)
+				while (k <= i + 6) {
+					// Check if the shape at the current index has a value of 1
+					if (shapes[shape][k] == 1) {
+						// Ensure that the next row (i + 1) is within the game area boundary
+						if (coordinates[k].i + 1 < 20) { //bottom edge
+							// Check if the position in the next row is occupied
+							if (b->gameArea[coordinates[k].i + 1][coordinates[k].j]->getIsOccupied() == 1) {
+								// Return 1 if the position is occupied (collision detected)
 								return 1;
 							}
-							// Exit the loop if a block is found and no collision detected
-							break;
 						}
-						k += 2; // Skip to the next relevant index if no block at current index
+						else {
+							return 1;
+						}
+						// Exit the loop if a block is found and no collision detected
+						break;
 					}
+					k += 2; // Skip to the next relevant index if no block at current index
 				}
-				// If no collision is detected, return 0 (no collision)
-				return 0;
-
-				//return collision_down(b, 2, 0, 1);
 			}
+			// If no collision is detected, return 0 (no collision)
+			return 0;
+
+			//return collision_down(0, 1);
 		}
 
 		else {	// rotation == 3, 270deg
@@ -261,13 +312,13 @@ bool brick::collision(board* b, int direction) {	// direction of falling: 0 - do
 			// If no collision is detected, return 0 (no collision)
 			return 0;
 
-			//return collision_down(b, 3, 0, 6);
+			//return collision_down(0, 6);
 		}
 	}
 }
 
 //only tested for rotation == 0
-bool brick::collision_down(board* b, int rotation, int min, int max) {
+bool brick::collision_down(int min, int max) {
 	for (int i = min; i <= max; (rotation == 1 || rotation == 3)? i += 2 : ++i) {
 		int k = i;
 		// Check until reaching a relevant index 
