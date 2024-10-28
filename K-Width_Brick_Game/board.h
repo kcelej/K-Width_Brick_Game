@@ -2,7 +2,7 @@
 #include <QtWidgets>
 #include "tile.h"
 
-//Avoiding magic numbers
+//Avoiding magic numbers, in future move to Defines.h file
 #define Game_Area_Height 20
 #define Game_Area_Width 10
 

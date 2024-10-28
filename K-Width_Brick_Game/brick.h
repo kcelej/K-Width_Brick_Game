@@ -15,7 +15,15 @@ public:
 	struct point {
 		int i;
 		int j;
-	} coordinates[8];	// coordinates of each tile, -1 is the default for "not shown on screen"
+
+		point() : i(0), j(0) {}
+
+		point copy_old_coordinates(point* old) {
+			this->i = old->i;
+			this->j = old->j;
+			return *this;
+		}
+	};	// basic coordinates i = 0, j = 0, changed later in the brick constructor to invisible in the game area
 
 	const bool shapes[7][8]{
 		{1,0,
@@ -53,6 +61,15 @@ public:
 	~brick() { b = nullptr; }
 	void draw();
 
+	void reset_entire_brick();
+
+	/*
+	* Main idea
+	* Moves the block in the appropriate direction depending on which event in the QKeyEvent occurred
+	* Possible movements left, right, down
+	*/
+	void movement(QKeyEvent* event);
+
 	/*
 	* Method changes the value of the brick rotation field
 	* @param new_rotation new rotation we want to set
@@ -65,16 +82,9 @@ public:
 	* @param direction integer value that tells which way the block is moving
 	* @return Return true if collision detected, false otherwise 
 	*/
-	bool collision(int direction);	// directions: 0 - down, 1 - left, 2 - right
+	bool collision (int direction) const;	// directions: 0 - down, 1 - left, 2 - right
 
-	/*
-	* Checks collisions only with downward movement of block 
-	* @param min lower range to for loop
-	* @param max upper range to for loop
-	* @return Return true if collision detected, false otherwise 
-	*/
-	bool collision_down(int min, int max); 
-
+	point coordinates[8];
 private:
 	int colour;	// sprite's colour
 	int shape; // sprite's shape
@@ -86,5 +96,13 @@ private:
 	* @return True if rotation is possible, otherwise false 
 	*/
 	bool rotate();
+
+	/*
+	* Checks collisions only with downward movement of block
+	* @param min lower range to for loop
+	* @param max upper range to for loop
+	* @return Return true if collision detected, false otherwise
+	*/
+	bool collision_down(int min, int max) const;
 };
 

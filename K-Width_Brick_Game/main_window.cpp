@@ -1,9 +1,17 @@
 #include "main_window.h"
+
+//Avoiding magic numbers, in future move to Defines.h file
+#define direction_down 0
+#define direction_left 1
+#define direction_right 2
+
 #include <QtWidgets>
 
 #include <QTimer>
 #include <QCoreApplication>
 #include <QDebug>
+
+#include <QKeyEvent>
 
 #include <QPixMap>
 #include <QGraphicsPixmapItem>
@@ -12,10 +20,9 @@
 #include "brick.h"
 #include "board.h"
 
-
+//only for tests
 using namespace std;
 int z = 0;
-
 int brickTestOrder(int var) {
     var++;
     if (var > 7) var = 0;
@@ -84,79 +91,64 @@ void main_window::on_testGameButton_clicked() {
 
         // example brick for testing
        //brick* player = new brick(random(0, 6), 3);
-        brick* player = new brick(random(0, 6), z++, gameBoard);
-
-
-        // example position for testing
-        player->coordinates[0].i = 0;
-        player->coordinates[0].j = 4;
-        player->coordinates[1].i = 0;
-        player->coordinates[1].j = 5;
-        player->coordinates[2].i = 1;
-        player->coordinates[2].j = 4;
-        player->coordinates[3].i = 1;
-        player->coordinates[3].j = 5;
-        player->coordinates[4].i = 2;
-        player->coordinates[4].j = 4;
-        player->coordinates[5].i = 2;
-        player->coordinates[5].j = 5;
-        player->coordinates[6].i = 3;
-        player->coordinates[6].j = 4;
-        player->coordinates[7].i = 3;
-        player->coordinates[7].j = 5;
-        player->draw();
-
-
+        brick* player = new brick(random(0, 6), random(0, 6), gameBoard);
+        //brick* player = new brick(random(0, 6), z++, gameBoard);
+   
         // example movement downwards for testing
-        for (int i = 0; i < 30; i++) {
-            if (player->collision(0) != 1) {
-                if (i == 3) {
-                    player->set_rotation(1);
-                }
-                if (i == 8) {
-                    player->set_rotation(2);
-                }
-                    for (int j = 0; j < 8; j++) {
-                        gameBoard->resetTile(player->coordinates[j].i, player->coordinates[j].j);   // changes the tiles to default texture
-                        player->coordinates[j].i++; // lowers the brick by one tile
-                    }
-                    player->draw();    // changes the game board tiles to the brick shape
-                }
-           delayOneSecond();
-        }
+        int i = 0;
+        while (true) {
+            if (player->collision(direction_down)) {
+                player->draw();
+                break;
+            }
+           if (i == 3) {
+               player->set_rotation(1);
+           }
+           if (i == 8) {
+                player->set_rotation(2);
+           }
+           if (i == 13) {
+              player->set_rotation(3);
+           }
+           if (i == 18) {
+               player->set_rotation(0);
+           }
+           player->reset_entire_brick();
+           for (int j = 0; j < 8; j++) {
+              player->coordinates[j].i++; // lowers the brick by one tile
+           }
+          ++i;
+          player->draw();    // changes the game board tiles to the brick shape
+          //delayOneSecond();
+        }   
     //    //brick* player1 = new brick(random(0, 6), 5);
-    //    brick* player1 = new brick(random(0, 6), random(0, 6), gameBoard);
-
-    //// example position for testing
-    //    player1->coordinates[0].i = 0;
-    //    player1->coordinates[0].j = 4;
-    //    player1->coordinates[1].i = 0;
-    //    player1->coordinates[1].j = 5;
-    //    player1->coordinates[2].i = 1;
-    //    player1->coordinates[2].j = 4;
-    //    player1->coordinates[3].i = 1;
-    //    player1->coordinates[3].j = 5;
-    //    player1->coordinates[4].i = 2;
-    //    player1->coordinates[4].j = 4;
-    //    player1->coordinates[5].i = 2;
-    //    player1->coordinates[5].j = 5;
-    //    player1->coordinates[6].i = 3;
-    //    player1->coordinates[6].j = 4;
-    //    player1->coordinates[7].i = 3;
-    //    player1->coordinates[7].j = 5;
-    //    player1->draw();
-
-    //    // example movement downwards for testing
-    //    for (int i = 0; i < 30; i++) {
-    //        if (player1->collision(0) != 1) {
-    //            for (int j = 0; j < 8; j++) {
-    //                gameBoard->resetTile(player1->coordinates[j].i, player1->coordinates[j].j);   // changes the tiles to default texture
-    //                player1->coordinates[j].i++; // lowers the brick by one tile
-    //            }
-    //            player1->draw();    // changes the game board tiles to the brick shape
-    //        }
-
-    //    }
+        /*
+    brick* player1 = new brick(random(0, 6), random(0, 6), gameBoard);
+    // example movement downwards for testing
+        i = 0;
+    while (true) {
+        if (player1->collision(direction_down)) break;
+        if (i == 3) {
+            player1->set_rotation(1);
+        }
+        if (i == 8) {
+            player1->set_rotation(2);
+        }
+        if (i == 13) {
+            // player1->set_rotation(3);
+        }
+        if (i == 18) {
+            //player1->set_rotation(0);
+        }
+        player1->reset_entire_brick();
+        for (int j = 0; j < 8; j++) {
+            player1->coordinates[j].i++; // lowers the brick by one tile
+        }
+        ++i;
+        player1->draw();    // changes the game board tiles to the brick shape
+        //delayOneSecond();
+    }
+    */
 
     }
     catch (...) {

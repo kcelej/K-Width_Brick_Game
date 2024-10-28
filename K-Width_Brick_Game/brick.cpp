@@ -2,20 +2,39 @@
 
 
 brick::brick(int col, int sh, board* _b) : colour(col), shape(sh), rotation(0), b(_b) {
-	for (int i = 0; i < 8; i++) {
-		coordinates[i].i = -1;
-		coordinates[i].j = -1;
-	}
+	//initial position of each brick, above game area
+	coordinates[0].i = -4;
+	coordinates[0].j = 4;
+	coordinates[1].i = -4;
+	coordinates[1].j = 5;
+	coordinates[2].i = -3;
+	coordinates[2].j = 4;
+	coordinates[3].i = -3;
+	coordinates[3].j = 5;
+	coordinates[4].i = -2;
+	coordinates[4].j = 4;
+	coordinates[5].i = -2;
+	coordinates[5].j = 5;
+	coordinates[6].i = -1;
+	coordinates[6].j = 4;
+	coordinates[7].i = -1;
+	coordinates[7].j = 5;
 }
 
 void brick::draw() {
 	for (int i = 0; i < 8; i++) {
-		if (shapes[shape][i] != 0) {
-			if (coordinates[i].i != -1 || coordinates[i].j != -1) {
+		if (shapes[shape][i]) {
+			if (coordinates[i].i >= 0 && coordinates[i].j >= 0) {
 				b->changeTile(coordinates[i].i, coordinates[i].j, this->colour);
-				//b->changeTileStatus(coordinates[i].i, coordinates[i].j, 1);
+				b->changeTileStatus(coordinates[i].i, coordinates[i].j, 1);
 			}
 		}
+	}
+}
+
+void brick::reset_entire_brick() {
+	for (int i = 0; i < 8; i++) {
+		if (shapes[shape][i]) b->resetTile(coordinates[i].i, coordinates[i].j);
 	}
 }
 
@@ -31,8 +50,36 @@ void brick::set_rotation(int new_rotation) {
 	}
 }
 
+//do the cleaning later!
 bool brick::rotate() {
+	//save the old coordinates temporarily 
+	point Old_coordinates[8];
+	for (int i = 0; i < 8; ++i) {
+		Old_coordinates[i].copy_old_coordinates(&coordinates[i]);
+	}
+
+	//in the future, use switch to make it simpler and shorter
 	if (rotation == 0) {
+		//check for border
+		if (coordinates[6].i - 3 < 0) {
+			//can't rotate
+			qDebug() << "Rotation not possible.";
+			return 0;
+		}
+
+		//reset old tiles
+		reset_entire_brick();
+
+		//check for other blocks
+		for (int i = 6; i >= 4; i -= 2) {
+			for (int x = 0; x <= 3; ++x) {
+				if (b->gameArea[coordinates[i].i - x][coordinates[i].j]->getIsOccupied()) {
+					//can't rotate
+					qDebug() << "Rotation not possible.";
+					return 0;
+				}
+			}
+		}
 		/*
 		basic idea
 		from
@@ -45,19 +92,13 @@ bool brick::rotate() {
 				[4][5]
 				[6][7]
 		*/
-		//check if rotation can occur?
-		/*if () {
-			return 0;
-		}
-		else{*/
-
 		//rotate
 		for (int i = 6; i <= 7; ++i) {
 			int k = i;
 			//If we go odd line then take y coordinates from 7, if even then y coordinates 6
-			int y = coordinates[6].i;
+			int y = Old_coordinates[6].i;
 			//If we go odd line then take x coordinates from 6, if even then x coordinates 4
-			int x = coordinates[(i % 2) ? 6 : 4].j;
+			int x = Old_coordinates[(i % 2) ? 6 : 4].j;
 			while (k >= i - 6) {
 				//x coordinates doesn't change only y
 				coordinates[k].i = y--;
@@ -65,11 +106,33 @@ bool brick::rotate() {
 				k -= 2;
 			}
 		}
+		draw();
 		// Rotation possible and done, return true
+		qDebug() << "Rotation possible and done.";
 		return 1;
 	}
 
 	else if (rotation == 1) {
+		//check for border
+		if (coordinates[6].j + 3 >= gameWindowWidth) {
+			//can't rotate
+			qDebug() << "Rotation not possible.";
+			return 0;
+		}
+
+		//reset old tiles
+		reset_entire_brick();
+
+		//check for other blocks
+		for (int i = 6; i >= 4; i -= 2) {
+			for (int x = 0; x <= 3; ++x) {
+				if (b->gameArea[coordinates[i].i][coordinates[i].j + x]->getIsOccupied()) {
+					//can't rotate
+					qDebug() << "Rotation not possible.";
+					return 0;
+				}
+			}
+		}
 		/*
 		basic idea
 		from
@@ -78,22 +141,15 @@ bool brick::rotate() {
 		[4][5]
 		[6][7]
 
-		to 
-		[6][4][2][0]
-		[7][5][3][1]
+		to
+				[6][4][2][0]
+				[7][5][3][1]
 		*/
-
-		//check if free space is available?
-		/*if () {
-			return 0;
-		}
-		else{*/
-
 		for (int i = 6; i <= 7; ++i) {
 			int k = i;
 			//If we go odd column then take y coordinates from 6, if even then x coordinates 4
-			int y = coordinates[(i % 2) ? 7 : 4].i;
-			int x = coordinates[6].j;
+			int y = Old_coordinates[(i % 2) ? 7 : 4].i;
+			int x = Old_coordinates[6].j;
 			while (k >= i - 6) {
 				//y coordinates doesn't change only x
 				coordinates[k].i = y;
@@ -101,12 +157,33 @@ bool brick::rotate() {
 				k -= 2;
 			}
 		}
-
+		draw();
 		// Rotation possible and done, return true
+		qDebug() << "Rotation possible and done.";
 		return 1;
 	}
 
 	if (rotation == 2) { // 180 degrees
+		//check for border
+		if (coordinates[6].i + 3 >= gameWindowHeight) {
+			//can't rotate
+			qDebug() << "Rotation not possible.";
+			return 0;
+		}
+
+		//reset old tiles
+		reset_entire_brick();
+
+		//check for other blocks
+		for (int i = 6; i >= 4; i -= 2) {
+			for (int x = 0; x <= 3; ++x) {
+				if (b->gameArea[coordinates[i].i + x][coordinates[i].j]->getIsOccupied()) {
+					//can't rotate
+					qDebug() << "Rotation not possible.";
+					return 0;
+				}
+			}
+		}
 		/*
 		basic idea
 		from
@@ -114,23 +191,16 @@ bool brick::rotate() {
 		[7][5][3][1]
 
 		to
-		[7][6]
-		[5][4]
-		[3][2]
-		[1][0]
+				[7][6]
+				[5][4]
+				[3][2]
+				[1][0]
 		*/
-
-		//check if rotation can occur?
-		/*if () {
-			return 0;
-		}
-		else{*/
-
 		for (int i = 6; i <= 7; ++i) {
 			int k = i;
 			//If we go odd column then take y coordinates from 6, if even then x coordinates 4
-			int y = coordinates[6].i;
-			int x = coordinates[(i % 2) ? 6: 4].j;
+			int y = Old_coordinates[6].i;
+			int x = Old_coordinates[(i % 2) ? 6 : 4].j;
 			while (k >= i - 6) {
 				//x coordinates doesn't change only y
 				coordinates[k].i = y++;
@@ -138,12 +208,33 @@ bool brick::rotate() {
 				k -= 2;
 			}
 		}
-
+		draw();
 		// Rotation possible and done, return true
+		qDebug() << "Rotation possible and done.";
 		return 1;
 	}
 
 	else {	// rotation == 3
+		//check for border
+		if (coordinates[6].j - 3 < 0) {
+			//can't rotate
+			qDebug() << "Rotation not possible.";
+			return 0;
+		}
+
+		//reset old tiles
+		reset_entire_brick();
+
+		//check for other blocks
+		for (int i = 6; i >= 4; i -= 2) {
+			for (int x = 0; x <= 3; ++x) {
+				if (b->gameArea[coordinates[i].i][coordinates[i].j - x]->getIsOccupied()) {
+					//can't rotate
+					qDebug() << "Rotation not possible.";
+					return 0;
+				}
+			}
+		}
 		/*
 		basic idea
 		from
@@ -153,21 +244,14 @@ bool brick::rotate() {
 		[1][0]
 
 		to
-		[1][3][5][7]
-		[0][2][4][6]
+				[1][3][5][7]
+				[0][2][4][6]
 		*/
-
-		//check if rotation can occur?
-		/*if () {
-			return 0;
-		}
-		else{*/
-
 		for (int i = 6; i <= 7; ++i) {
 			int k = i;
 			//If we go odd column then take y coordinates from 6, if even then x coordinates 4
-			int y = coordinates[6].i;
-			int x = coordinates[(i % 2) ? 6 : 4].j;
+			int y = Old_coordinates[(i % 2) ? 6 : 4].i;
+			int x = Old_coordinates[6].j;
 			while (k >= i - 6) {
 				//y coordinates doesn't change only x
 				coordinates[k].i = y;
@@ -175,18 +259,19 @@ bool brick::rotate() {
 				k -= 2;
 			}
 		}
+		draw();
 		// Rotation possible and done, return true
+		qDebug() << "Rotation possible and done.";
 		return 1;
 	}
 }
 
-
-bool brick::collision(int direction) {	// direction of falling: 0 - down, 1 - left, 2 - right
+bool brick::collision(int direction) const {	// direction of falling: 0 - down, 1 - left, 2 - right
 	if (direction == 1) {
-
+		return 0;
 	}
 	else if (direction == 2) {
-
+		return 0;
 	}
 	else {	// direction == 0
 		if (rotation == 0) {
@@ -219,106 +304,127 @@ bool brick::collision(int direction) {	// direction of falling: 0 - down, 1 - le
 			//return 0;
 
 			//Returns 1 if collision is detected, 0 if not
+			/*
+			[0][1]
+			[2][3]
+			[4][5]
+			[6][7]
+			*/
 			return collision_down(6, 7);
 		}
 
 		else if (rotation == 1) { //90deg
-			// Loop through indices 1, 3, 5 and 7 to check the corresponding shapes and coordinates
-			for (int i = 1; i <= 7; i += 2) {
-				int k = i;
-				// Check until reaching a relevant index (0 or 1)
-				while (k >= i - 1) {
-					// Check if the shape at the current index has a value of 1
-					if (shapes[shape][k] == 1) {
-						// Ensure that the next row (i + 1) is within the game area boundary
-						if (coordinates[k].i + 1 < 20) { //bottom edge
-							// Check if the position in the next row is occupied
-							if (b->gameArea[coordinates[k].i + 1][coordinates[k].j]->getIsOccupied() == 1) {
-								// Return 1 if the position is occupied (collision detected)
-								return 1;
-							}
-						}
-						else {
-							return 1;
-						}
-						// Exit the loop if a block is found and no collision detected
-						break;
-					}
-					--k; // Skip to the next relevant index if no block at current index
-				}
-			}
-			// If no collision is detected, return 0 (no collision)
-			return 0;
-
-			//return collision_down(1, 7);
+			//delete in the future
+			//// Loop through indices 1, 3, 5 and 7 to check the corresponding shapes and coordinates
+			//for (int i = 1; i <= 7; i += 2) {
+			//	int k = i;
+			//	// Check until reaching a relevant index (0 or 1)
+			//	while (k >= i - 1) {
+			//		// Check if the shape at the current index has a value of 1
+			//		if (shapes[shape][k] == 1) {
+			//			// Ensure that the next row (i + 1) is within the game area boundary
+			//			if (coordinates[k].i + 1 < 20) { //bottom edge
+			//				// Check if the position in the next row is occupied
+			//				if (b->gameArea[coordinates[k].i + 1][coordinates[k].j]->getIsOccupied() == 1) {
+			//					// Return 1 if the position is occupied (collision detected)
+			//					return 1;
+			//				}
+			//			}
+			//			else {
+			//				return 1;
+			//			}
+			//			// Exit the loop if a block is found and no collision detected
+			//			break;
+			//		}
+			//		--k; // Skip to the next relevant index if no block at current index
+			//	}
+			//}
+			//// If no collision is detected, return 0 (no collision)
+			//return 0;
+			/*
+			[6][4][2][0]
+			[7][5][3][1]
+			*/
+			return collision_down(1, 7);
 		}
 
 		else if (rotation == 2) { // 180 degrees rotation
-			// Loop through indices 0 and 1 to check the corresponding shapes and coordinates
-			for (int i = 0; i <= 1; i++) {
-				int k = i;
-				// Check until reaching a relevant index (6 or 7)
-				while (k <= i + 6) {
-					// Check if the shape at the current index has a value of 1
-					if (shapes[shape][k] == 1) {
-						// Ensure that the next row (i + 1) is within the game area boundary
-						if (coordinates[k].i + 1 < 20) { //bottom edge
-							// Check if the position in the next row is occupied
-							if (b->gameArea[coordinates[k].i + 1][coordinates[k].j]->getIsOccupied() == 1) {
-								// Return 1 if the position is occupied (collision detected)
-								return 1;
-							}
-						}
-						else {
-							return 1;
-						}
-						// Exit the loop if a block is found and no collision detected
-						break;
-					}
-					k += 2; // Skip to the next relevant index if no block at current index
-				}
-			}
-			// If no collision is detected, return 0 (no collision)
-			return 0;
-
-			//return collision_down(0, 1);
+			//delete in the future
+			//// Loop through indices 0 and 1 to check the corresponding shapes and coordinates
+			//for (int i = 0; i <= 1; i++) {
+			//	int k = i;
+			//	// Check until reaching a relevant index (6 or 7)
+			//	while (k <= i + 6) {
+			//		// Check if the shape at the current index has a value of 1
+			//		if (shapes[shape][k] == 1) {
+			//			// Ensure that the next row (i + 1) is within the game area boundary
+			//			if (coordinates[k].i + 1 < 20) { //bottom edge
+			//				// Check if the position in the next row is occupied
+			//				if (b->gameArea[coordinates[k].i + 1][coordinates[k].j]->getIsOccupied() == 1) {
+			//					// Return 1 if the position is occupied (collision detected)
+			//					return 1;
+			//				}
+			//			}
+			//			else {
+			//				return 1;
+			//			}
+			//			// Exit the loop if a block is found and no collision detected
+			//			break;
+			//		}
+			//		k += 2; // Skip to the next relevant index if no block at current index
+			//	}
+			//}
+			//// If no collision is detected, return 0 (no collision)
+			//return 0;
+			/*
+			[7][6]
+			[5][4]
+			[3][2]
+			[1][0]
+			*/
+			return collision_down(0, 1);
 		}
-
 		else {	// rotation == 3, 270deg
-			// Loop through indices 0, 2, 4 and 6 to check the corresponding shapes and coordinates
-			for (int i = 0; i <= 6; i += 2) {
-				int k = i;
-				// Check until reaching a relevant index (0 or 1)
-				while (k <= i + 1) {
-					// Check if the shape at the current index has a value of 1
-					if (shapes[shape][k] == 1) {
-						// Ensure that the next row (i + 1) is within the game area boundary
-						if (coordinates[k].i + 1 < 20) { //bottom edge
-							// Check if the position in the next row is occupied
-							if (b->gameArea[coordinates[k].i + 1][coordinates[k].j]->getIsOccupied() == 1) {
-								// Return 1 if the position is occupied (collision detected)
-								return 1;
-							}
-						}
-						else {
-							return 1;
-						}
-						// Exit the loop if a block is found and no collision detected
-						break;
-					}
-					++k; // Skip to the next relevant index if no block at current index
-				}
-			}
-			// If no collision is detected, return 0 (no collision)
-			return 0;
-
-			//return collision_down(0, 6);
+			//delete in the future
+			//// Loop through indices 0, 2, 4 and 6 to check the corresponding shapes and coordinates
+			//for (int i = 0; i <= 6; i += 2) {
+			//	int k = i;
+			//	// Check until reaching a relevant index (0 or 1)
+			//	while (k <= i + 1) {
+			//		// Check if the shape at the current index has a value of 1
+			//		if (shapes[shape][k] == 1) {
+			//			// Ensure that the next row (i + 1) is within the game area boundary
+			//			if (coordinates[k].i + 1 < 20) { //bottom edge
+			//				// Check if the position in the next row is occupied
+			//				if (b->gameArea[coordinates[k].i + 1][coordinates[k].j]->getIsOccupied() == 1) {
+			//					// Return 1 if the position is occupied (collision detected)
+			//					return 1;
+			//				}
+			//			}
+			//			else {
+			//				return 1;
+			//			}
+			//			// Exit the loop if a block is found and no collision detected
+			//			break;
+			//		}
+			//		++k; // Skip to the next relevant index if no block at current index
+			//	}
+			//}
+			//// If no collision is detected, return 0 (no collision)
+			//return 0;
+			/*
+			[1][3][5][7]
+			[0][2][4][6]
+			*/
+			return collision_down(0, 6);
 		}
 	}
 }
 
-//only tested for rotation == 0
-bool brick::collision_down(int min, int max) {
+bool brick::collision_down(int min, int max) const {
+	// Ensure that the next row (i + 1) is within the game area boundary
+	if (coordinates[min].i + 1 >= 20) return 1;
+
 	for (int i = min; i <= max; (rotation == 1 || rotation == 3)? i += 2 : ++i) {
 		int k = i;
 		// Check until reaching a relevant index 
@@ -327,19 +433,13 @@ bool brick::collision_down(int min, int max) {
 			k <= i + 6 && k >= i - 6) { //no
 			// Check if the shape at the current index has a value of 1
 			if (shapes[shape][k] == 1) {
-				// Ensure that the next row (i + 1) is within the game area boundary
-				if (coordinates[k].i + 1 < 20) { //bottom edge
-					// Check if the position in the next row is occupied
-					if (b->gameArea[coordinates[k].i + 1][coordinates[k].j]->getIsOccupied() == 1) {
-						// Return 1 if the position is occupied (collision detected)
-						return 1;
-					}
-				}
-				else {
+				// Check if the position in the next row is occupied
+				if (b->gameArea[coordinates[k].i + 1][coordinates[k].j]->getIsOccupied() == 1) {
+					// Return 1 if the position is occupied (collision detected)
 					return 1;
 				}
-				// Exit the loop if a block is found and no collision detected
-				break;
+			// Exit the loop if a block is found and no collision detected
+			break;
 			}
 			// Skip to the next relevant index if no block at current index
 			switch (rotation) {
@@ -354,6 +454,9 @@ bool brick::collision_down(int min, int max) {
 				break;
 			case 3:
 				++k;
+				break;
+			default:
+				//exception
 				break;
 			}
 		}
