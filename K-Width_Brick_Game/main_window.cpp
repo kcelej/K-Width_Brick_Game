@@ -90,8 +90,8 @@ void main_window::on_testGameButton_clicked() {
 
 
         // example brick for testing
-       //brick* player = new brick(random(0, 6), 3);
-        brick* player = new brick(random(0, 6), random(0, 6), gameBoard);
+        brick* player = new brick(random(0, 6), 0, gameBoard);
+        //brick* player = new brick(random(0, 6), random(0, 6), gameBoard);
         //brick* player = new brick(random(0, 6), z++, gameBoard);
    
         // example movement downwards for testing
@@ -111,7 +111,7 @@ void main_window::on_testGameButton_clicked() {
               player->set_rotation(3);
            }
            if (i == 18) {
-               player->set_rotation(0);
+               //player->set_rotation(0);
            }
            player->reset_entire_brick();
            for (int j = 0; j < 8; j++) {
@@ -119,11 +119,12 @@ void main_window::on_testGameButton_clicked() {
            }
           ++i;
           player->draw();    // changes the game board tiles to the brick shape
-          //delayOneSecond();
+         delayOneSecond();
         }   
-    //    //brick* player1 = new brick(random(0, 6), 5);
-        /*
-    brick* player1 = new brick(random(0, 6), random(0, 6), gameBoard);
+        
+    brick* player1 = new brick(random(0, 6), 1, gameBoard);
+   // brick* player1 = new brick(random(0, 6), random(0, 6), gameBoard);
+   
     // example movement downwards for testing
         i = 0;
     while (true) {
@@ -148,7 +149,7 @@ void main_window::on_testGameButton_clicked() {
         player1->draw();    // changes the game board tiles to the brick shape
         //delayOneSecond();
     }
-    */
+    
 
     }
     catch (...) {

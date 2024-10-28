@@ -50,14 +50,16 @@ void brick::set_rotation(int new_rotation) {
 	}
 }
 
-//do the cleaning later!
+//OLD VERSION
+/*
 bool brick::rotate() {
+	//OLD VERSION
+	
 	//save the old coordinates temporarily 
 	point Old_coordinates[8];
 	for (int i = 0; i < 8; ++i) {
 		Old_coordinates[i].copy_old_coordinates(&coordinates[i]);
 	}
-
 	//in the future, use switch to make it simpler and shorter
 	if (rotation == 0) {
 		//check for border
@@ -80,18 +82,17 @@ bool brick::rotate() {
 				}
 			}
 		}
-		/*
-		basic idea
-		from
-		[1][3][5][7]
-		[0][2][4][6]
-
-		to
-				[0][1]
-				[2][3]
-				[4][5]
-				[6][7]
-		*/
+		
+		//basic idea
+		//from
+		//[1][3][5][7]
+		//[0][2][4][6]
+		//to
+				//[0][1]
+				//[2][3]
+				//[4][5]
+				//[6][7]
+		
 		//rotate
 		for (int i = 6; i <= 7; ++i) {
 			int k = i;
@@ -111,7 +112,6 @@ bool brick::rotate() {
 		qDebug() << "Rotation possible and done.";
 		return 1;
 	}
-
 	else if (rotation == 1) {
 		//check for border
 		if (coordinates[6].j + 3 >= gameWindowWidth) {
@@ -119,10 +119,8 @@ bool brick::rotate() {
 			qDebug() << "Rotation not possible.";
 			return 0;
 		}
-
 		//reset old tiles
 		reset_entire_brick();
-
 		//check for other blocks
 		for (int i = 6; i >= 4; i -= 2) {
 			for (int x = 0; x <= 3; ++x) {
@@ -133,18 +131,18 @@ bool brick::rotate() {
 				}
 			}
 		}
-		/*
-		basic idea
-		from
-		[0][1]
-		[2][3]
-		[4][5]
-		[6][7]
+		
+		//basic idea
+		//from
+		//[0][1]
+		//[2][3]
+		//[4][5]
+		//[6][7]
 
-		to
-				[6][4][2][0]
-				[7][5][3][1]
-		*/
+		//to
+				//[6][4][2][0]
+				//[7][5][3][1]
+
 		for (int i = 6; i <= 7; ++i) {
 			int k = i;
 			//If we go odd column then take y coordinates from 6, if even then x coordinates 4
@@ -184,18 +182,18 @@ bool brick::rotate() {
 				}
 			}
 		}
-		/*
-		basic idea
-		from
-		[6][4][2][0]
-		[7][5][3][1]
 
-		to
-				[7][6]
-				[5][4]
-				[3][2]
-				[1][0]
-		*/
+		//basic idea
+		//from
+		//[6][4][2][0]
+		//[7][5][3][1]
+
+		//to
+				//[7][6]
+				//[5][4]
+				//[3][2]
+				//[1][0]
+
 		for (int i = 6; i <= 7; ++i) {
 			int k = i;
 			//If we go odd column then take y coordinates from 6, if even then x coordinates 4
@@ -235,23 +233,23 @@ bool brick::rotate() {
 				}
 			}
 		}
-		/*
-		basic idea
-		from
-		[7][6]
-		[5][4]
-		[3][2]
-		[1][0]
 
-		to
-				[1][3][5][7]
-				[0][2][4][6]
-		*/
+		//basic idea
+		//from
+		//[7][6]
+		//[5][4]
+		//[3][2]
+		//[1][0]
+
+		/to
+				//[1][3][5][7]
+				//[0][2][4][6]
+
 		for (int i = 6; i <= 7; ++i) {
 			int k = i;
 			//If we go odd column then take y coordinates from 6, if even then x coordinates 4
 			int y = Old_coordinates[(i % 2) ? 6 : 4].i;
-			int x = Old_coordinates[6].j;
+				int x = Old_coordinates[6].j;
 			while (k >= i - 6) {
 				//y coordinates doesn't change only x
 				coordinates[k].i = y;
@@ -263,6 +261,134 @@ bool brick::rotate() {
 		// Rotation possible and done, return true
 		qDebug() << "Rotation possible and done.";
 		return 1;
+	}
+}
+*/
+
+//NEW VERSION
+bool brick::rotate() {
+	if (shape == 1) return false; //no need to rotate O
+	// Save the old coordinates temporarily
+	point Old_coordinates[8];
+	for (int i = 0; i < 8; ++i) {
+		Old_coordinates[i].copy_old_coordinates(&coordinates[i]);
+	}
+
+	// Check boundaries and reset tiles
+	if (!checkBoundariesAndReset()) {
+		return false; // Can't rotate
+	}
+
+	// Check for other blocks
+	if (!checkForOtherBlocks()) {
+		return false; // Can't rotate
+	}
+
+	// Perform rotation based on the current rotation value
+	switch (rotation) {
+	case 0:
+		rotateDefault(Old_coordinates);
+		break;
+	case 1:
+		rotate90Degrees(Old_coordinates);
+		break;
+	case 2:
+		rotate180Degrees(Old_coordinates);
+		break;
+	case 3:
+		rotate270Degrees(Old_coordinates);
+		break;
+	default:
+		qDebug() << "Invalid rotation.";
+		return false;
+	}
+
+	draw();
+	qDebug() << "Rotation possible and done.";
+	return true;
+}
+
+bool brick::checkBoundariesAndReset() {
+	if ((rotation == 0 && coordinates[6].i - 3 < 0) ||
+		(rotation == 1 && coordinates[6].j + 3 >= gameWindowWidth) ||
+		(rotation == 2 && coordinates[6].i + 3 >= gameWindowHeight) ||
+		(rotation == 3 && coordinates[6].j - 3 < 0)) {
+		qDebug() << "Rotation not possible.";
+		return false;
+	}
+
+	reset_entire_brick();
+	return true;
+}
+
+bool brick::checkForOtherBlocks() {
+	for (int i = 6; i >= 4; i -= 2) {
+		for (int x = 0; x <= 3; ++x) {
+			int newX = (rotation == 1 || rotation == 3) ? coordinates[i].j + (rotation == 1 ? x : -x) : coordinates[i].j;
+			int newY = (rotation == 0 || rotation == 2) ? coordinates[i].i + (rotation == 2 ? x : -x) : coordinates[i].i;
+
+			if (b->gameArea[newY][newX]->getIsOccupied()) {
+				qDebug() << "Rotation not possible.";
+				return false;
+			}
+		}
+	}
+	return true;
+}
+
+void brick::rotateDefault(point* Old_coordinates) {
+	for (int i = 6; i <= 7; ++i) {
+		int k = i;
+		int y = Old_coordinates[6].i;
+		int x = Old_coordinates[(i % 2) ? 6 : 4].j;
+
+		while (k >= i - 6) {
+			coordinates[k].i = y--;
+			coordinates[k].j = x;
+			k -= 2;
+		}
+	}
+}
+
+void brick::rotate90Degrees(point* Old_coordinates) {
+	for (int i = 6; i <= 7; ++i) {
+		int k = i;
+		int y = Old_coordinates[(i % 2) ? 7 : 4].i;
+		int x = Old_coordinates[6].j;
+
+		while (k >= i - 6) {
+			coordinates[k].i = y;
+			coordinates[k].j = x++;
+			k -= 2;
+		}
+	}
+}
+
+void brick::rotate180Degrees(point* Old_coordinates) {
+	for (int i = 6; i <= 7; ++i) {
+		int k = i;
+		int y = Old_coordinates[6].i;
+		int x = Old_coordinates[(i % 2) ? 6 : 4].j;
+
+		while (k >= i - 6) {
+			coordinates[k].i = y++;
+			coordinates[k].j = x;
+			k -= 2;
+		}
+	}
+}
+
+void brick::rotate270Degrees(point* Old_coordinates) {
+	for (int i = 6; i <= 7; ++i) {
+		int k = i;
+		int y = Old_coordinates[(i % 2) ? 6 : 4].i;
+		int x = Old_coordinates[6].j;
+
+		while (k >= i - 6) {
+			coordinates[k].i = y;
+			coordinates[k].j = x--;
+			k -= 2;
+		}
 	}
 }
 
@@ -436,6 +562,7 @@ bool brick::collision_down(int min, int max) const {
 				// Check if the position in the next row is occupied
 				if (b->gameArea[coordinates[k].i + 1][coordinates[k].j]->getIsOccupied() == 1) {
 					// Return 1 if the position is occupied (collision detected)
+					qDebug() << "collision detected.";
 					return 1;
 				}
 			// Exit the loop if a block is found and no collision detected

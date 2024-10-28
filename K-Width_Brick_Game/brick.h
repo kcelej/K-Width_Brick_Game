@@ -92,10 +92,47 @@ private:
 	board* b = nullptr; // pointer to board
 
 	/*
-	* Method checks possibility of changing brick rotation
-	* @return True if rotation is possible, otherwise false 
+	* Rotates the brick based on the current rotation state.
+	* Checks for boundaries and collisions before performing the rotation.
+	* @return Return true if rotation is possible and completed successfully, false otherwise.
 	*/
 	bool rotate();
+
+	/*
+	* Rotates the coordinates to default position.
+	* @param Old_coordinates Array of old coordinates before rotation.
+	*/
+	void rotateDefault(point* Old_coordinates);
+
+	/*
+	* Rotates the coordinates 90 degrees clockwise.
+	* @param Old_coordinates Array of old coordinates before rotation.
+	*/
+	void rotate90Degrees(point* Old_coordinates);
+
+	/*
+	* Rotates the coordinates 180 degrees.
+	* @param Old_coordinates Array of old coordinates before rotation.
+	*/
+	void rotate180Degrees(point* Old_coordinates);
+
+	/*
+	* Rotates the coordinates 270 degrees counter-clockwise (or 90 degrees clockwise).
+	* @param Old_coordinates Array of old coordinates before rotation.
+	*/
+	void rotate270Degrees(point* Old_coordinates);
+
+	/*
+	 * Checks boundaries for the current rotation and resets the tiles.
+	 * @return Return true if rotation is possible and tiles are reset, false otherwise.
+	*/
+	bool checkBoundariesAndReset();
+
+	/*
+	* Checks for other blocks in the game area which may already occupy the space we are checking
+	* @return Return true if no collision with other blocks is detected, false otherwise.
+	*/
+	bool checkForOtherBlocks();
 
 	/*
 	* Checks collisions only with downward movement of block
@@ -104,5 +141,9 @@ private:
 	* @return Return true if collision detected, false otherwise
 	*/
 	bool collision_down(int min, int max) const;
+
+	bool collision_left(int min, int max) const;
+
+	bool collision_right(int min, int max) const;
 };
 
