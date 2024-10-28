@@ -37,7 +37,7 @@ void delayOneSecond()
         qDebug() << "1 second has passed.";
         });
 
-    timer.start(1000);  // Start the timer with a 1-second interval
+    timer.start(500);  // Start the timer with a 1-second interval
     QCoreApplication::processEvents(QEventLoop::AllEvents, 1000);
 
     // Process events until the timer times out
@@ -87,71 +87,46 @@ void main_window::on_testGameButton_clicked() {
         gameView->setHorizontalScrollBarPolicy(Qt::ScrollBarAlwaysOff);
         gameView->setVerticalScrollBarPolicy(Qt::ScrollBarAlwaysOff);
 
+        brick* player = nullptr;
+        int how_many = 1;
+        while (how_many <= 6) { //for now spawn only 6 blocks
+            // example brick for testing
+            player = new brick(z++, random(0, 6), gameBoard);
+           // player = new brick(random(0, 6), random(0, 6), gameBoard);
+            //player = new brick(random(0, 6), z++, gameBoard);
 
+            // example movement downwards for testing
+            int i = 0;
+            while (true) {
+                if (i == 3) {
+                    // player->set_rotation(1);
+                }
+                if (i == 4) {
+                    // player->set_rotation(2);
+                }
+                if (i == 5) {
+                    //player->set_rotation(3);
+                }
+                if (i == 6) {
+                    //player->set_rotation(0);
+                }
+                player->reset_entire_brick();
+                if (!player->move_down()) {
+                    how_many++;
+                    player->draw();
+                    player = nullptr;
+                    break;
+                }
 
-        // example brick for testing
-        brick* player = new brick(random(0, 6), 0, gameBoard);
-        //brick* player = new brick(random(0, 6), random(0, 6), gameBoard);
-        //brick* player = new brick(random(0, 6), z++, gameBoard);
-   
-        // example movement downwards for testing
-        int i = 0;
-        while (true) {
-            if (player->collision(direction_down)) {
-                player->draw();
-                break;
+                //if (!(i % 4)) player->move_left();
+                //if (!(i % 4)) player->move_right();
+                ++i;
+                player->draw();    // changes the game board tiles to the brick shape
+                //delayOneSecond();
             }
-           if (i == 3) {
-               player->set_rotation(1);
-           }
-           if (i == 8) {
-                player->set_rotation(2);
-           }
-           if (i == 13) {
-              player->set_rotation(3);
-           }
-           if (i == 18) {
-               //player->set_rotation(0);
-           }
-           player->reset_entire_brick();
-           for (int j = 0; j < 8; j++) {
-              player->coordinates[j].i++; // lowers the brick by one tile
-           }
-          ++i;
-          player->draw();    // changes the game board tiles to the brick shape
-         delayOneSecond();
-        }   
-        
-    brick* player1 = new brick(random(0, 6), 1, gameBoard);
-   // brick* player1 = new brick(random(0, 6), random(0, 6), gameBoard);
-   
-    // example movement downwards for testing
-        i = 0;
-    while (true) {
-        if (player1->collision(direction_down)) break;
-        if (i == 3) {
-            player1->set_rotation(1);
         }
-        if (i == 8) {
-            player1->set_rotation(2);
-        }
-        if (i == 13) {
-            // player1->set_rotation(3);
-        }
-        if (i == 18) {
-            //player1->set_rotation(0);
-        }
-        player1->reset_entire_brick();
-        for (int j = 0; j < 8; j++) {
-            player1->coordinates[j].i++; // lowers the brick by one tile
-        }
-        ++i;
-        player1->draw();    // changes the game board tiles to the brick shape
-        //delayOneSecond();
     }
-    
 
-    }
     catch (...) {
         QMessageBox::information(this, "Error", "Error during game test");
     }

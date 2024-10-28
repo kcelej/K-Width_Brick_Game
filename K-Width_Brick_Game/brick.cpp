@@ -1,6 +1,5 @@
 #include "brick.h"
 
-
 brick::brick(int col, int sh, board* _b) : colour(col), shape(sh), rotation(0), b(_b) {
 	// Initialize the initial position of each brick above the game area
 	for (int k = 0; k < 8; ++k) {
@@ -24,8 +23,49 @@ void brick::draw() {
 
 void brick::reset_entire_brick() {
 	for (int i = 0; i < 8; i++) {
-		if (shapes[shape][i]) b->resetTile(coordinates[i].i, coordinates[i].j);
+		if (coordinates[i].i >= 0 && coordinates[i].j >= 0) {
+			if (shapes[shape][i]) b->resetTile(coordinates[i].i, coordinates[i].j);
+		}
 	}
+}
+
+bool brick::move_down() {
+	//first check for border and other bricks
+	if (!collision(0)) {
+		//no collision, move blocks 1 block lower
+		for (int i = 0; i < 8; i++) {
+			coordinates[i].i++;
+		}
+		//brick moved
+		return true;
+	}
+	//brick not moved and should not be moved more
+	qDebug() << "Stop moving this block.";
+	return false;
+}
+
+void brick::move_left() {
+	//first check for border and other bricks
+	if (!collision(1)) {
+		//no collision, move blocks to the left
+		for (int i = 0; i < 8; i++) {
+			coordinates[i].j--;
+		}
+		qDebug() << "Moved to the left.";
+	}
+	//brick not moved but can be still moved around
+}
+
+void brick::move_right() {
+	//first check for border and other bricks
+	if (!collision(2)) {
+		//no collision, move blocks to the right
+		for (int i = 0; i < 8; i++) {
+			coordinates[i].j++;
+		}
+		qDebug() << "Moved to the right.";
+	}
+	//brick not moved but can be still moved around
 }
 
 void brick::set_rotation(int new_rotation) {
@@ -265,9 +305,11 @@ bool brick::rotate() {
 	}
 
 	// Check boundaries and reset tiles
-	if (!checkBoundariesAndReset()) {
+	if (!checkBoundariesForRotation()) {
 		return false; // Can't rotate
 	}
+
+	reset_entire_brick();
 
 	// Check for other blocks
 	if (!checkForOtherBlocks()) {
@@ -298,7 +340,15 @@ bool brick::rotate() {
 	return true;
 }
 
-bool brick::checkBoundariesAndReset() {
+bool brick::checkBoundariesForRotation() {
+	//is whole brick shown?
+	for (int i = 0; i < 8; i++) {
+		if(shape[shapes][i] && coordinates[i].i < 0) {
+			qDebug() << "Rotation not possible.";
+			return false;
+		}
+	}
+
 	if ((rotation == 0 && coordinates[6].i - 3 < 0) ||
 		(rotation == 1 && coordinates[6].j + 3 >= gameWindowWidth) ||
 		(rotation == 2 && coordinates[6].i + 3 >= gameWindowHeight) ||
@@ -306,12 +356,10 @@ bool brick::checkBoundariesAndReset() {
 		qDebug() << "Rotation not possible.";
 		return false;
 	}
-
-	reset_entire_brick();
 	return true;
 }
 
-bool brick::checkForOtherBlocks() {
+bool brick::checkForOtherBlocks() const {
 	for (int i = 6; i >= 4; i -= 2) {
 		for (int x = 0; x <= 3; ++x) {
 			int newX = (rotation == 1 || rotation == 3) ? coordinates[i].j + (rotation == 1 ? x : -x) : coordinates[i].j;
@@ -382,202 +430,473 @@ void brick::rotate270Degrees(point* Old_coordinates) {
 	}
 }
 
-bool brick::collision(int direction) const {	// direction of falling: 0 - down, 1 - left, 2 - right
-	if (direction == 1) {
-		return 0;
-	}
-	else if (direction == 2) {
-		return 0;
-	}
-	else {	// direction == 0
+//NEW VERSION BUT LAME
+//Delete if the new method is 100% correct
+/*
+bool brick::collision(int direction) {
+	if (direction == 0) {
 		if (rotation == 0) {
-			//delete in the future
-			//// Loop through indices 6 and 7 to check the corresponding shapes and coordinates
-			//for (int i = 6; i <= 7; i++) {
-			//	int k = i;
-			//	// Check until reaching a relevant index (0 or 1)
-			//	while (k >= i - 6) {
-			//		// Check if the shape at the current index has a value of 1
-			//		if (shapes[shape][k] == 1) {
-			//			// Ensure that the next row (i + 1) is within the game area boundary
-			//			if (coordinates[k].i + 1 < 20) { //bottom edge
-			//				// Check if the position in the next row is occupied
-			//				if (b->gameArea[coordinates[k].i + 1][coordinates[k].j]->getIsOccupied() == 1) {
-			//					// Return 1 if the position is occupied (collision detected)
-			//					return 1;
-			//				}
-			//			}
-			//			else {
-			//				return 1;
-			//			}
-			//			// Exit the loop if a block is found and no collision detected
-			//			break;
-			//		}
-			//		k -= 2; // Skip to the next relevant index if no block at current index
-			//	}
-			//}
-			//// If no collision is detected, return 0 (no collision)
-			//return 0;
-
-			//Returns 1 if collision is detected, 0 if not
-			/*
-			[0][1]
-			[2][3]
-			[4][5]
-			[6][7]
-			*/
-			return collision_down(6, 7);
+			//check for border
+			for (int i = 7; i >= 0; i--) {
+				if (shape[shapes][i] && coordinates[i].i >= 0) {
+					if (coordinates[i].i + 1 >= Game_Area_Height) {
+						qDebug() << "Collision with border.";
+						return true;
+					}
+					// Exit the loop if a block is found and no collision detected
+					break;
+				}
+			}
+			//check for collision with other bricks
+			for (int i = 6; i <= 7; i++) {
+				int k = i;
+				while (k >= i - 6) {
+					// Check if the shape at the current index has a value of 1
+					if (shape[shapes][k] && coordinates[k].i >= 0) {
+						// Check if the position in the next row is occupied
+						if (b->gameArea[coordinates[k].i + 1][coordinates[k].j]->getIsOccupied()) {
+							// Return 1 if the position is occupied (collision detected)
+							qDebug() << "Collision with another brick.";
+							return true;
+						}
+						// Exit the loop if a block is found and no collision detected
+						break;
+					}
+					k -= 2; // Skip to the next relevant index if no block at current index
+				}
+			}
 		}
-
 		else if (rotation == 1) { //90deg
-			//delete in the future
-			//// Loop through indices 1, 3, 5 and 7 to check the corresponding shapes and coordinates
-			//for (int i = 1; i <= 7; i += 2) {
-			//	int k = i;
-			//	// Check until reaching a relevant index (0 or 1)
-			//	while (k >= i - 1) {
-			//		// Check if the shape at the current index has a value of 1
-			//		if (shapes[shape][k] == 1) {
-			//			// Ensure that the next row (i + 1) is within the game area boundary
-			//			if (coordinates[k].i + 1 < 20) { //bottom edge
-			//				// Check if the position in the next row is occupied
-			//				if (b->gameArea[coordinates[k].i + 1][coordinates[k].j]->getIsOccupied() == 1) {
-			//					// Return 1 if the position is occupied (collision detected)
-			//					return 1;
-			//				}
-			//			}
-			//			else {
-			//				return 1;
-			//			}
-			//			// Exit the loop if a block is found and no collision detected
-			//			break;
-			//		}
-			//		--k; // Skip to the next relevant index if no block at current index
-			//	}
-			//}
-			//// If no collision is detected, return 0 (no collision)
-			//return 0;
-			/*
-			[6][4][2][0]
-			[7][5][3][1]
-			*/
-			return collision_down(1, 7);
-		}
+			//check for border
+			for (int i = 1; i <= 7; i += 2) {
+				int k = i;
+				while (k > i - 1) {
+					if (shape[shapes][k] && coordinates[k].i >= 0) {
+						if (coordinates[k].i + 1 >= Game_Area_Height) {
+							qDebug() << "Collision with border.";
+							return true;
+						}
+						// Exit the loop if a block is found and no collision detected
+						break;
+					}
+					k--;
+				}
+			}
 
-		else if (rotation == 2) { // 180 degrees rotation
-			//delete in the future
-			//// Loop through indices 0 and 1 to check the corresponding shapes and coordinates
-			//for (int i = 0; i <= 1; i++) {
-			//	int k = i;
-			//	// Check until reaching a relevant index (6 or 7)
-			//	while (k <= i + 6) {
-			//		// Check if the shape at the current index has a value of 1
-			//		if (shapes[shape][k] == 1) {
-			//			// Ensure that the next row (i + 1) is within the game area boundary
-			//			if (coordinates[k].i + 1 < 20) { //bottom edge
-			//				// Check if the position in the next row is occupied
-			//				if (b->gameArea[coordinates[k].i + 1][coordinates[k].j]->getIsOccupied() == 1) {
-			//					// Return 1 if the position is occupied (collision detected)
-			//					return 1;
-			//				}
-			//			}
-			//			else {
-			//				return 1;
-			//			}
-			//			// Exit the loop if a block is found and no collision detected
-			//			break;
-			//		}
-			//		k += 2; // Skip to the next relevant index if no block at current index
-			//	}
-			//}
-			//// If no collision is detected, return 0 (no collision)
-			//return 0;
-			/*
-			[7][6]
-			[5][4]
-			[3][2]
-			[1][0]
-			*/
-			return collision_down(0, 1);
+			//check for collision with other bricks
+			for (int i = 1; i <= 7; i += 2) {
+				int k = i;
+				while (k >= i - 1) {
+					// Check if the shape at the current index has a value of 1
+					if (shape[shapes][k] && coordinates[k].i >= 0) {
+						// Check if the position in the next row is occupied
+						if (b->gameArea[coordinates[k].i + 1][coordinates[k].j]->getIsOccupied()) {
+							// Return 1 if the position is occupied (collision detected)
+							qDebug() << "Collision with another brick.";
+							return 1;
+						}
+						// Exit the loop if a block is found and no collision detected
+						break;
+					}
+					--k; // Skip to the next relevant index if no block at current index
+				}
+			}
 		}
-		else {	// rotation == 3, 270deg
-			//delete in the future
-			//// Loop through indices 0, 2, 4 and 6 to check the corresponding shapes and coordinates
-			//for (int i = 0; i <= 6; i += 2) {
-			//	int k = i;
-			//	// Check until reaching a relevant index (0 or 1)
-			//	while (k <= i + 1) {
-			//		// Check if the shape at the current index has a value of 1
-			//		if (shapes[shape][k] == 1) {
-			//			// Ensure that the next row (i + 1) is within the game area boundary
-			//			if (coordinates[k].i + 1 < 20) { //bottom edge
-			//				// Check if the position in the next row is occupied
-			//				if (b->gameArea[coordinates[k].i + 1][coordinates[k].j]->getIsOccupied() == 1) {
-			//					// Return 1 if the position is occupied (collision detected)
-			//					return 1;
-			//				}
-			//			}
-			//			else {
-			//				return 1;
-			//			}
-			//			// Exit the loop if a block is found and no collision detected
-			//			break;
-			//		}
-			//		++k; // Skip to the next relevant index if no block at current index
-			//	}
-			//}
-			//// If no collision is detected, return 0 (no collision)
-			//return 0;
-			/*
-			[1][3][5][7]
-			[0][2][4][6]
-			*/
-			return collision_down(0, 6);
+		else if (rotation == 2) { //180deg
+			//check for border
+			for (int i = 0; i <= 7; i++) {
+				if (shape[shapes][i] && coordinates[i].i >= 0) {
+					if (coordinates[i].i + 1 >= Game_Area_Height) {
+						qDebug() << "Collision with border.";
+						return true;
+					}
+					// Exit the loop if a block is found and no collision detected
+					break;
+				}
+			}
+			//check for collision with other bricks
+			for (int i = 0; i <= 1; i++) {
+				int k = i;
+				while (k <= i + 6) {
+					// Check if the shape at the current index has a value of 1
+					if (shape[shapes][k] && coordinates[k].i >= 0) {
+						// Check if the position in the next row is occupied
+						if (b->gameArea[coordinates[k].i + 1][coordinates[k].j]->getIsOccupied()) {
+							// Return 1 if the position is occupied (collision detected)
+							return 1;
+						}
+						// Exit the loop if a block is found and no collision detected
+						break;
+					}
+					k += 2; // Skip to the next relevant index if no block at current index
+				}
+			}
+		}
+		else if (rotation == 3) { //270deg
+			//check for border
+			for (int i = 0; i <= 6; i += 2) {
+				int k = i;
+				while (k < i + 1) {
+					if (shape[shapes][k] && coordinates[k].i >= 0) {
+						if (coordinates[k].i + 1 >= Game_Area_Height) {
+							qDebug() << "Collision with border.";
+							return true;
+						}
+						// Exit the loop if a block is found and no collision detected
+						break;
+					}
+					k++;
+				}
+			}
+			//check for collision with other bricks
+			for (int i = 0; i <= 6; i += 2) {
+				int k = i;
+				while (k <= i + 1) {
+					// Check if the shape at the current index has a value of 1
+					if (shape[shapes][k] && coordinates[k].i >= 0) {
+						// Check if the position in the next row is occupied
+						if (b->gameArea[coordinates[k].i + 1][coordinates[k].j]->getIsOccupied()) {
+							// Return 1 if the position is occupied (collision detected)
+							return true;
+						}
+						// Exit the loop if a block is found and no collision detected
+						break;
+					}
+					++k; // Skip to the next relevant index if no block at current index
+				}
+			}
+		}
+	}	
+	else if (direction == 1) {
+		if (rotation == 0) { //default
+			//check for border
+			for (int i = 0; i <= 6; i += 2) {
+				int k = i;
+				while (k <= i + 1) {
+					if (shape[shapes][k] && coordinates[k].i >= 0) {
+						if (coordinates[k].j - 1 < 0) {
+							qDebug() << "Collision with border.";
+							return true;
+						}
+						// Exit the loop if a block is found and no collision detected
+						break;
+					}
+					k++;
+				}
+			}
+			//check for collision with other bricks
+			for (int i = 0; i <= 6; i += 2) {
+				int k = i;
+				while (k <= i + 1) {
+					// Check if the shape at the current index has a value of 1
+					if (shape[shapes][k] && coordinates[k].i >= 0) {
+						// Check if the position in the previous collumn is occupied
+						if (b->gameArea[coordinates[k].i][coordinates[k].j - 1]->getIsOccupied()) {
+							// Return 1 if the position is occupied (collision detected)
+							qDebug() << "collision with another block detected.";
+							return true;
+						}
+					}
+					// Exit the loop if a block is found and no collision detected
+					break;
+				}
+				k++; // Skip to the next relevant index if no block at current index
+			}
+		}
+		else if (rotation == 1) { //90deg
+			//check for border
+			for (int i = 6; i <= 7; i++) {
+				int k = i;
+				while (k >= i - 6) {
+					if (shape[shapes][k] && coordinates[k].i >= 0) {
+						if (coordinates[k].j - 1 < 0) {
+							qDebug() << "Collision with border.";
+							return 1;
+						}
+						break;
+					}
+					k -= 2;
+				}
+			}
+			//check for collision with other bricks
+			for (int i = 6; i <= 7; i++) {
+				int k = i;
+				while (k >= i - 6) {
+					// Check if the shape at the current index has a value of 1
+					if (shape[shapes][k] && coordinates[k].i >= 0) {
+						// Check if the position in the previous collumn is occupied
+						if (b->gameArea[coordinates[k].i][coordinates[k].j - 1]->getIsOccupied()) {
+							// Return 1 if the position is occupied (collision detected)
+							qDebug() << "collision with another block detected.";
+							return true;
+						}
+						// Exit the loop if a block is found and no collision detected
+						break;
+					}
+					k -= 2; // Skip to the next relevant index if no block at current index
+				}
+			}
+		}
+		else if (rotation == 2) { //180deg
+			//check for border
+			for (int i = 1; i <= 7; i++) {
+				int k = i;
+				while (k >= i - 1) {
+					if (shape[shapes][k] && coordinates[k].i >= 0) {
+						if (coordinates[k].j - 1 < 0) {
+							qDebug() << "Collision with border.";
+							return true;
+						}
+						break;
+					}
+					k--;
+				}
+			}
+			//check for collision with other bricks
+			for (int i = 1; i <= 7; i++) {
+				int k = i;
+				while (k >= i - 1) {
+					// Check if the shape at the current index has a value of 1
+					if (shape[shapes][k] && coordinates[k].i >= 0) {
+						// Check if the position in the previous collumn is occupied
+						if (b->gameArea[coordinates[k].i][coordinates[k].j - 1]->getIsOccupied()) {
+							// Return 1 if the position is occupied (collision detected)
+							qDebug() << "collision with another block detected.";
+							return true;
+						}
+					}
+					// Exit the loop if a block is found and no collision detected
+					break;
+				}
+				k--; // Skip to the next relevant index if no block at current index
+			}
+		}
+		else if (rotation == 3) { //270deg
+			//check for border
+			for (int i = 0; i <= 1; i++) {
+				int k = i;
+				while (k <= i + 6) {
+					if (shape[shapes][k] && coordinates[k].i >= 0) {
+						if (coordinates[k].j - 1 < 0) {
+							qDebug() << "Collision with border.";
+							return true;
+						}
+						break;
+					}
+					k += 2;
+				}
+			}
+			//check for collision with other bricks
+			for (int i = 0; i <= 1; i++) {
+				int k = i;
+				while (k <= i + 6) {
+					// Check if the shape at the current index has a value of 1
+					if (shape[shapes][k] && coordinates[k].i >= 0) {
+						// Check if the position in the previous collumn is occupied
+						if (b->gameArea[coordinates[k].i][coordinates[k].j - 1]->getIsOccupied()) {
+							// Return 1 if the position is occupied (collision detected)
+							qDebug() << "collision with another block detected.";
+							return true;
+						}
+					}
+					// Exit the loop if a block is found and no collision detected
+					break;
+				}
+				k += 2; // Skip to the next relevant index if no block at current index
+			}
 		}
 	}
+	else if (direction == 2) { // right
+		if (rotation == 0) { //default
+			//check for border
+			for (int i = 1; i <= 7; i += 2) {
+				int k = i;
+				while (k >= i - 1) {
+					if (shape[shapes][k] && coordinates[k].i >= 0) {
+						if (coordinates[k].j + 1 >= Game_Area_Width) {
+							qDebug() << "Collision with border.";
+							return true;
+						}
+						// Exit the loop if a block is found and no collision detected
+						break;
+					}
+					k--;
+				}
+			}
+			//check for collision with other bricks
+			for (int i = 1; i <= 7; i += 2) {
+				int k = i;
+				while (k >= i - 1) {
+					// Check if the shape at the current index has a value of 1
+					if (shape[shapes][k] && coordinates[k].i >= 0) {
+						// Check if the position in the previous collumn is occupied
+						if (b->gameArea[coordinates[k].i][coordinates[k].j + 1]->getIsOccupied()) {
+							// Return 1 if the position is occupied (collision detected)
+							qDebug() << "collision with another block detected.";
+							return true;
+						}
+					}
+					// Exit the loop if a block is found and no collision detected
+					break;
+				}
+				k--;; // Skip to the next relevant index if no block at current index
+			}
+		}
+		else if (rotation == 1) { //90deg
+			//check for border
+			for (int i = 0; i <= 1; i++) {
+				int k = i;
+				while (k <= i + 6) {
+					if (shape[shapes][k] && coordinates[k].i >= 0) {
+						if (coordinates[k].j + 1 >= Game_Area_Width) {
+							qDebug() << "Collision with border.";
+							return true;
+						}
+						// Exit the loop if a block is found and no collision detected
+						break;
+					}
+					k += 2;
+				}
+			}
+			//check for collision with other bricks
+			for (int i = 0; i <= 1; i++) {
+				int k = i;
+				while (k <= i + 6) {
+					// Check if the shape at the current index has a value of 1
+					if (shape[shapes][k] && coordinates[k].i >= 0) {
+						// Check if the position in the previous collumn is occupied
+						if (b->gameArea[coordinates[k].i][coordinates[k].j + 1]->getIsOccupied()) {
+							// Return 1 if the position is occupied (collision detected)
+							qDebug() << "collision with another block detected.";
+							return true;
+						}
+						// Exit the loop if a block is found and no collision detected
+						break;
+					}
+					k += 2; // Skip to the next relevant index if no block at current index
+				}
+			}
+		}
+		else if (rotation == 2) { //180deg
+			//check for border
+			for (int i = 0; i <= 6; i += 2) {
+				int k = i;
+				while (k <= i + 1) {
+					if (shape[shapes][k] && coordinates[k].i >= 0) {
+						if (coordinates[k].j + 1 >= Game_Area_Width) {
+							qDebug() << "Collision with border.";
+							return true;
+						}
+						// Exit the loop if a block is found and no collision detected
+						break;
+					}
+					k++;
+				}
+			}
+			//check for collision with other bricks
+			for (int i = 0; i <= 6; i += 2) {
+				int k = i;
+				while (k <= i + 1) {
+					// Check if the shape at the current index has a value of 1
+					if (shape[shapes][k] && coordinates[k].i >= 0) {
+						// Check if the position in the previous collumn is occupied
+						if (b->gameArea[coordinates[k].i][coordinates[k].j + 1]->getIsOccupied()) {
+							// Return 1 if the position is occupied (collision detected)
+							qDebug() << "collision with another block detected.";
+							return true;
+						}
+					}
+					// Exit the loop if a block is found and no collision detected
+					break;
+				}
+				k++; // Skip to the next relevant index if no block at current index
+			}
+		}
+		else if (rotation == 3) { //270deg
+			//check for border
+			for (int i = 6; i <= 7; i++) {
+				int k = i;
+				while (k >= i - 6) {
+					if (shape[shapes][k] && coordinates[k].i >= 0) {
+						if (coordinates[k].j + 1 >= Game_Area_Width) {
+							qDebug() << "Collision with border.";
+							return true;
+						}
+						// Exit the loop if a block is found and no collision detected
+						break;
+					}
+					k -= 2;
+				}
+			}
+			//check for collision with other bricks
+			for (int i = 6; i <= 7; i++) {
+				int k = i;
+				while (k >= i - 6) {
+					// Check if the shape at the current index has a value of 1
+					if (shape[shapes][k] && coordinates[k].i >= 0) {
+						// Check if the position in the previous collumn is occupied
+						if (b->gameArea[coordinates[k].i][coordinates[k].j + 1]->getIsOccupied()) {
+							// Return 1 if the position is occupied (collision detected)
+							qDebug() << "collision with another block detected.";
+							return true;
+						}
+					}
+					// Exit the loop if a block is found and no collision detected
+					break;
+				}
+				k -= 2; // Skip to the next relevant index if no block at current index
+			}
+		}
+	}
+	//no collision detected
+	return 0;
+}
+*/
+
+//NEW BETTER VERSION
+//Generally tested, it is not known whether there are any special exceptions
+bool brick::checkCollisionBoundary(int index, int offset_i, int offset_j) const {
+	// Calculate the target coordinates for each part of the brick
+	int target_i = coordinates[index].i + offset_i;
+	int target_j = coordinates[index].j + offset_j;
+
+	// Check if the target coordinates are within the game area boundaries
+	if (target_i < 0 || target_i >= Game_Area_Height || target_j < 0 || target_j >= Game_Area_Width) {
+		qDebug() << "Collision with border.";
+		return true;
+	}
+
+	// Check if the target position is occupied by another block
+	if (b->gameArea[target_i][target_j]->getIsOccupied()) {
+		qDebug() << "Collision with another block.";
+		return true;
+	}
+
+	// If no collision, return false
+	return false;
 }
 
-bool brick::collision_down(int min, int max) const {
-	// Ensure that the next row (i + 1) is within the game area boundary
-	if (coordinates[min].i + 1 >= 20) return 1;
+//NEW BETTER VERSION
+//Generally tested, it is not known whether there are any special exceptions
+bool brick::collision(int direction) {
+	int offset_i = 0, offset_j = 0;
 
-	for (int i = min; i <= max; (rotation == 1 || rotation == 3)? i += 2 : ++i) {
-		int k = i;
-		// Check until reaching a relevant index 
-		while ((rotation == 1 || rotation == 3) ? 
-			k <= i + 1 && k >= i - 1 : //yes
-			k <= i + 6 && k >= i - 6) { //no
-			// Check if the shape at the current index has a value of 1
-			if (shapes[shape][k] == 1) {
-				// Check if the position in the next row is occupied
-				if (b->gameArea[coordinates[k].i + 1][coordinates[k].j]->getIsOccupied() == 1) {
-					// Return 1 if the position is occupied (collision detected)
-					qDebug() << "collision detected.";
-					return 1;
-				}
-			// Exit the loop if a block is found and no collision detected
-			break;
-			}
-			// Skip to the next relevant index if no block at current index
-			switch (rotation) {
-			case 0:
-				k -= 2;
-				break;
-			case 1:
-				--k;
-				break;
-			case 2:
-				k += 2;
-				break;
-			case 3:
-				++k;
-				break;
-			default:
-				//exception
-				break;
+	switch (direction) {
+	case 0: offset_i = 1; break; // Down
+	case 1: offset_j = -1; break; // Left
+	case 2: offset_j = 1; break; // Right
+	default: return false;
+	}
+
+	// Check collision for each part of the brick
+	for (int i = 0; i < 8; i++) {
+		if (shape[shapes][i] && coordinates[i].i >= 0) {
+			if (checkCollisionBoundary(i, offset_i, offset_j)) {
+				return true; // Collision detected
 			}
 		}
 	}
-	// If no collision is detected, return 0 (no collision)
-	return 0;
+
+	// No collision detected
+	return false;
 }

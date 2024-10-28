@@ -11,6 +11,28 @@ public:
 	[4][5]
 	[6][7]
 	*/
+	/*
+	Brick rotation
+		Rotation = 0
+		[0][1]
+		[2][3]
+		[4][5]
+		[6][7]
+
+		Rotation = 1
+		[6][4][2][0]
+		[7][5][3][1]
+
+		Rotation = 2
+		[7][6]
+		[5][4]
+		[3][2]
+		[1][0]
+
+		Rotation = 3
+		[1][3][5][7]
+		[0][2][4][6]
+	*/
 
 	struct point {
 		int i;
@@ -63,6 +85,12 @@ public:
 
 	void reset_entire_brick();
 
+	bool move_down();
+
+	void move_left();
+
+	void move_right();
+
 	/*
 	* Main idea
 	* Moves the block in the appropriate direction depending on which event in the QKeyEvent occurred
@@ -82,7 +110,7 @@ public:
 	* @param direction integer value that tells which way the block is moving
 	* @return Return true if collision detected, false otherwise 
 	*/
-	bool collision (int direction) const;	// directions: 0 - down, 1 - left, 2 - right
+	bool collision (int direction);	// directions: 0 - down, 1 - left, 2 - right
 
 	point coordinates[8];
 private:
@@ -123,27 +151,18 @@ private:
 	void rotate270Degrees(point* Old_coordinates);
 
 	/*
-	 * Checks boundaries for the current rotation and resets the tiles.
-	 * @return Return true if rotation is possible and tiles are reset, false otherwise.
+	 * Checks boundaries for the current rotation.
+	 * @return Return true if rotation is possible, false otherwise.
 	*/
-	bool checkBoundariesAndReset();
+	bool checkBoundariesForRotation();
 
 	/*
 	* Checks for other blocks in the game area which may already occupy the space we are checking
 	* @return Return true if no collision with other blocks is detected, false otherwise.
 	*/
-	bool checkForOtherBlocks();
+	bool checkForOtherBlocks() const;
+	
+	bool checkCollisionBoundary(int index, int offset_i, int offset_j) const;
 
-	/*
-	* Checks collisions only with downward movement of block
-	* @param min lower range to for loop
-	* @param max upper range to for loop
-	* @return Return true if collision detected, false otherwise
-	*/
-	bool collision_down(int min, int max) const;
-
-	bool collision_left(int min, int max) const;
-
-	bool collision_right(int min, int max) const;
 };
 

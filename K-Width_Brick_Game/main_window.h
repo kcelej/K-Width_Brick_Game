@@ -29,4 +29,5 @@ private slots:
 //      frame_passed = 0;
 //      move the block independently of the player one block down
 //  }
+// frame_passed++;
 //}
