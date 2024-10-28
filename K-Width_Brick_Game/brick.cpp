@@ -2,23 +2,13 @@
 
 
 brick::brick(int col, int sh, board* _b) : colour(col), shape(sh), rotation(0), b(_b) {
-	//initial position of each brick, above game area
-	coordinates[0].i = -4;
-	coordinates[0].j = 4;
-	coordinates[1].i = -4;
-	coordinates[1].j = 5;
-	coordinates[2].i = -3;
-	coordinates[2].j = 4;
-	coordinates[3].i = -3;
-	coordinates[3].j = 5;
-	coordinates[4].i = -2;
-	coordinates[4].j = 4;
-	coordinates[5].i = -2;
-	coordinates[5].j = 5;
-	coordinates[6].i = -1;
-	coordinates[6].j = 4;
-	coordinates[7].i = -1;
-	coordinates[7].j = 5;
+	// Initialize the initial position of each brick above the game area
+	for (int k = 0; k < 8; ++k) {
+		// Set coordinate i: -4 for the first two elements, -3 for the next two, and so on
+		coordinates[k].i = -4 + k / 2;
+		// Set coordinate j: 4 for even indices, 5 for odd indices
+		coordinates[k].j = 4 + k % 2;
+	}
 }
 
 void brick::draw() {
