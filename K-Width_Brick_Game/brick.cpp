@@ -12,9 +12,13 @@ brick::brick(int col, int sh, board* _b) : colour(col), shape(sh), rotation(0), 
 
 void brick::draw() {
 	for (int i = 0; i < 8; i++) {
+		// Check if the current part is active in the current shape
 		if (shapes[shape][i]) {
+			// Verify that the coordinates are within valid range
 			if (coordinates[i].i >= 0 && coordinates[i].j >= 0) {
+				// Set the tile to the brick's color
 				b->changeTile(coordinates[i].i, coordinates[i].j, this->colour);
+				// Mark the tile as occupied
 				b->changeTileStatus(coordinates[i].i, coordinates[i].j, 1);
 			}
 		}
@@ -23,54 +27,90 @@ void brick::draw() {
 
 void brick::reset_entire_brick() {
 	for (int i = 0; i < 8; i++) {
+		// Check if the current part has valid coordinates
 		if (coordinates[i].i >= 0 && coordinates[i].j >= 0) {
+			// If the part exists in the current shape, reset its tile in the game area
 			if (shapes[shape][i]) b->resetTile(coordinates[i].i, coordinates[i].j);
 		}
 	}
 }
 
 bool brick::move_down() {
-	//first check for border and other bricks
+	// Check for collision with the border or other blocks below
 	if (!collision(0)) {
-		//no collision, move blocks 1 block lower
+		// No collision detected, move each part of the brick down by one block
 		for (int i = 0; i < 8; i++) {
 			coordinates[i].i++;
 		}
-		//brick moved
+		// Brick successfully moved down
 		return true;
 	}
-	//brick not moved and should not be moved more
+	// Collision detected; stop moving the brick down
 	qDebug() << "Stop moving this block.";
 	return false;
 }
 
 void brick::move_left() {
-	//first check for border and other bricks
+	// Check for collision with the border or other blocks to the left
 	if (!collision(1)) {
-		//no collision, move blocks to the left
+		// No collision detected, move each part of the brick one block to the left
 		for (int i = 0; i < 8; i++) {
 			coordinates[i].j--;
 		}
 		qDebug() << "Moved to the left.";
 	}
-	//brick not moved but can be still moved around
+	// If collision is detected, the brick remains in its current position
 }
 
 void brick::move_right() {
-	//first check for border and other bricks
+	// Check for collision with the border or other blocks to the right
 	if (!collision(2)) {
-		//no collision, move blocks to the right
+		// No collision detected, move each part of the brick one block to the right
 		for (int i = 0; i < 8; i++) {
 			coordinates[i].j++;
 		}
 		qDebug() << "Moved to the right.";
 	}
-	//brick not moved but can be still moved around
+	// If collision is detected, the brick remains in its current position
 }
 
-void brick::set_rotation(int new_rotation) {
+bool brick::movement(QKeyEvent* event) {
+	switch (event->key()) {
+	case Qt::Key_Up:
+		qDebug() << "Up arrow pressed";
+		change_rotation();
+		return true;
+		break;
+
+	case Qt::Key_Down:
+		qDebug() << "Down arrow pressed";
+		move_down();
+		return true;
+		break;
+
+	case Qt::Key_Left:
+		qDebug() << "Left arrow pressed";
+		move_left();
+		return true;
+		break;
+
+	case Qt::Key_Right:
+		qDebug() << "Right arrow pressed";
+		move_right();
+		return true;
+		break;
+
+	default:
+		qDebug() << "Other key pressed";
+		return false;
+		break;
+	}
+	return false;
+}
+
+void brick::change_rotation() {
 	int old_rotation = rotation;
-	rotation = new_rotation;
+	increment_rotation();
 	//if the rotation does not cause any collisions rotate
 	if (rotate()) return;
 	else {
@@ -298,41 +338,45 @@ bool brick::rotate() {
 //NEW VERSION
 bool brick::rotate() {
 	if (shape == 1) return false; //no need to rotate O
-	// Save the old coordinates temporarily
-	point Old_coordinates[8];
-	for (int i = 0; i < 8; ++i) {
-		Old_coordinates[i].copy_old_coordinates(&coordinates[i]);
-	}
 
-	// Check boundaries and reset tiles
-	if (!checkBoundariesForRotation()) {
-		return false; // Can't rotate
+	// Save the old coordinates temporarily
+	point Tmp_coordinates[8];
+	for (int i = 0; i < 8; ++i) {
+		Tmp_coordinates[i].copy_coordinates(&coordinates[i]);
 	}
 
 	reset_entire_brick();
 
-	// Check for other blocks
-	if (!checkForOtherBlocks()) {
-		return false; // Can't rotate
-	}
-
 	// Perform rotation based on the current rotation value
 	switch (rotation) {
 	case 0:
-		rotateDefault(Old_coordinates);
+		rotateDefault(Tmp_coordinates);
 		break;
 	case 1:
-		rotate90Degrees(Old_coordinates);
+		rotate90Degrees(Tmp_coordinates);
 		break;
 	case 2:
-		rotate180Degrees(Old_coordinates);
+		rotate180Degrees(Tmp_coordinates);
 		break;
 	case 3:
-		rotate270Degrees(Old_coordinates);
+		rotate270Degrees(Tmp_coordinates);
 		break;
 	default:
 		qDebug() << "Invalid rotation.";
 		return false;
+	}
+
+	reset_entire_brick();
+
+	// Collision check for temporary coordinates
+	if (checkForCollision_Rotation(Tmp_coordinates)) {
+		qDebug() << "Rotation not possible due to collision.";
+		return false;
+	}
+
+	// If there are no collisions assign new positions 
+	for (int i = 0; i < 8; ++i) {
+		coordinates[i].copy_coordinates(&Tmp_coordinates[i]);
 	}
 
 	draw();
@@ -340,77 +384,58 @@ bool brick::rotate() {
 	return true;
 }
 
-bool brick::checkBoundariesForRotation() {
-	//is whole brick shown?
+bool brick::checkForCollision_Rotation(const point* temp_coords) const {
 	for (int i = 0; i < 8; i++) {
-		if(shape[shapes][i] && coordinates[i].i < 0) {
-			qDebug() << "Rotation not possible.";
-			return false;
+		// Check if the current brick part is part of the shape and has visible coordinates
+		// If the coordinates are out of the game window or occupied by another block, it indicates a collision
+		if (shapes[shape][i] && temp_coords[i].i >= 0 && temp_coords[i].j >= 0 &&
+			(temp_coords[i].i >= gameWindowHeight || temp_coords[i].j >= gameWindowWidth ||
+				b->gameArea[temp_coords[i].i][temp_coords[i].j]->getIsOccupied())) {
+			// Collision detected
+			return true;
 		}
 	}
-
-	if ((rotation == 0 && coordinates[6].i - 3 < 0) ||
-		(rotation == 1 && coordinates[6].j + 3 >= gameWindowWidth) ||
-		(rotation == 2 && coordinates[6].i + 3 >= gameWindowHeight) ||
-		(rotation == 3 && coordinates[6].j - 3 < 0)) {
-		qDebug() << "Rotation not possible.";
-		return false;
-	}
-	return true;
+	// No collision detected
+	return false;
 }
 
-bool brick::checkForOtherBlocks() const {
-	for (int i = 6; i >= 4; i -= 2) {
-		for (int x = 0; x <= 3; ++x) {
-			int newX = (rotation == 1 || rotation == 3) ? coordinates[i].j + (rotation == 1 ? x : -x) : coordinates[i].j;
-			int newY = (rotation == 0 || rotation == 2) ? coordinates[i].i + (rotation == 2 ? x : -x) : coordinates[i].i;
+void brick::rotateDefault(point* Temp_coordinates) {
+    for (int i = 6; i <= 7; ++i) {
+        int k = i;
+        int y = coordinates[6].i;
+        int x = coordinates[(i % 2) ? 6 : 4].j;
 
-			if (b->gameArea[newY][newX]->getIsOccupied()) {
-				qDebug() << "Rotation not possible.";
-				return false;
-			}
-		}
-	}
-	return true;
+        while (k >= i - 6) {
+            Temp_coordinates[k].i = y--;
+            Temp_coordinates[k].j = x;
+            k -= 2;
+        }
+    }
 }
 
-void brick::rotateDefault(point* Old_coordinates) {
+void brick::rotate90Degrees(point* Temp_coordinates) {
 	for (int i = 6; i <= 7; ++i) {
 		int k = i;
-		int y = Old_coordinates[6].i;
-		int x = Old_coordinates[(i % 2) ? 6 : 4].j;
+		int y = coordinates[(i % 2) ? 7 : 4].i;
+		int x = coordinates[6].j;
 
 		while (k >= i - 6) {
-			coordinates[k].i = y--;
-			coordinates[k].j = x;
+			Temp_coordinates[k].i = y;
+			Temp_coordinates[k].j = x++;
 			k -= 2;
 		}
 	}
 }
 
-void brick::rotate90Degrees(point* Old_coordinates) {
+void brick::rotate180Degrees(point* Temp_coordinates) {
 	for (int i = 6; i <= 7; ++i) {
 		int k = i;
-		int y = Old_coordinates[(i % 2) ? 7 : 4].i;
-		int x = Old_coordinates[6].j;
+		int y = coordinates[6].i;
+		int x = coordinates[(i % 2) ? 6 : 4].j;
 
 		while (k >= i - 6) {
-			coordinates[k].i = y;
-			coordinates[k].j = x++;
-			k -= 2;
-		}
-	}
-}
-
-void brick::rotate180Degrees(point* Old_coordinates) {
-	for (int i = 6; i <= 7; ++i) {
-		int k = i;
-		int y = Old_coordinates[6].i;
-		int x = Old_coordinates[(i % 2) ? 6 : 4].j;
-
-		while (k >= i - 6) {
-			coordinates[k].i = y++;
-			coordinates[k].j = x;
+			Temp_coordinates[k].i = y++;
+			Temp_coordinates[k].j = x;
 			k -= 2;
 		}
 	}
@@ -419,12 +444,12 @@ void brick::rotate180Degrees(point* Old_coordinates) {
 void brick::rotate270Degrees(point* Old_coordinates) {
 	for (int i = 6; i <= 7; ++i) {
 		int k = i;
-		int y = Old_coordinates[(i % 2) ? 6 : 4].i;
-		int x = Old_coordinates[6].j;
+		int y = coordinates[(i % 2) ? 6 : 4].i;
+		int x = coordinates[6].j;
 
 		while (k >= i - 6) {
-			coordinates[k].i = y;
-			coordinates[k].j = x--;
+			Old_coordinates[k].i = y;
+			Old_coordinates[k].j = x--;
 			k -= 2;
 		}
 	}
@@ -855,12 +880,12 @@ bool brick::collision(int direction) {
 
 //NEW BETTER VERSION
 //Generally tested, it is not known whether there are any special exceptions
-bool brick::checkCollisionBoundary(int index, int offset_i, int offset_j) const {
-	// Calculate the target coordinates for each part of the brick
+bool brick::checkForCollision_Movement(int index, int offset_i, int offset_j) const {
+	// Calculate the target coordinates for the brick part after applying the offset
 	int target_i = coordinates[index].i + offset_i;
 	int target_j = coordinates[index].j + offset_j;
 
-	// Check if the target coordinates are within the game area boundaries
+	// Check if the target coordinates are outside the game area boundaries
 	if (target_i < 0 || target_i >= Game_Area_Height || target_j < 0 || target_j >= Game_Area_Width) {
 		qDebug() << "Collision with border.";
 		return true;
@@ -872,7 +897,7 @@ bool brick::checkCollisionBoundary(int index, int offset_i, int offset_j) const 
 		return true;
 	}
 
-	// If no collision, return false
+	// No collision detected, return false
 	return false;
 }
 
@@ -891,7 +916,7 @@ bool brick::collision(int direction) {
 	// Check collision for each part of the brick
 	for (int i = 0; i < 8; i++) {
 		if (shape[shapes][i] && coordinates[i].i >= 0) {
-			if (checkCollisionBoundary(i, offset_i, offset_j)) {
+			if (checkForCollision_Movement(i, offset_i, offset_j)) {
 				return true; // Collision detected
 			}
 		}
@@ -899,4 +924,13 @@ bool brick::collision(int direction) {
 
 	// No collision detected
 	return false;
+}
+
+void brick::increment_rotation() {
+	if (rotation + 1 < 4) {
+		rotation++;
+	}
+	else {
+		rotation = 0;
+	}
 }

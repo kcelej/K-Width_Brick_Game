@@ -91,30 +91,38 @@ void main_window::on_testGameButton_clicked() {
         int how_many = 1;
         while (how_many <= 6) { //for now spawn only 6 blocks
             // example brick for testing
-            player = new brick(z++, random(0, 6), gameBoard);
+            player = new brick(z++, 4, gameBoard);
            // player = new brick(random(0, 6), random(0, 6), gameBoard);
             //player = new brick(random(0, 6), z++, gameBoard);
 
             // example movement downwards for testing
             int i = 0;
             while (true) {
+                if (i == 0) {
+                    player->move_left();
+                    player->change_rotation();
+                    //doesn't work properly
+                    player->change_rotation();
+                    player->change_rotation();
+                    player->change_rotation();
+                    player->move_left();
+                    player->move_left();
+
+                }
+                if (i == 1) {
+                   // player->change_rotation();
+                }
+                if (i == 2) {
+                    //player->change_rotation();
+                }
                 if (i == 3) {
-                    // player->set_rotation(1);
-                }
-                if (i == 4) {
-                    // player->set_rotation(2);
-                }
-                if (i == 5) {
-                    //player->set_rotation(3);
-                }
-                if (i == 6) {
-                    //player->set_rotation(0);
+                  // player->change_rotation();
                 }
                 player->reset_entire_brick();
                 if (!player->move_down()) {
                     how_many++;
                     player->draw();
-                    player = nullptr;
+                    player = nullptr; // memory leak FIX LATER!!!
                     break;
                 }
 
@@ -122,7 +130,7 @@ void main_window::on_testGameButton_clicked() {
                 //if (!(i % 4)) player->move_right();
                 ++i;
                 player->draw();    // changes the game board tiles to the brick shape
-                //delayOneSecond();
+                delayOneSecond();
             }
         }
     }

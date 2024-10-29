@@ -40,7 +40,7 @@ public:
 
 		point() : i(0), j(0) {}
 
-		point copy_old_coordinates(point* old) {
+		point copy_coordinates(point* old) {
 			this->i = old->i;
 			this->j = old->j;
 			return *this;
@@ -81,14 +81,47 @@ public:
 
 	brick(int col, int sh, board* _b);
 	~brick() { b = nullptr; }
+
+	/*
+	 * Draws the brick on the game area grid by setting each part of the brick to its specified color and updating its status.
+	 * @details This function iterates over each part of the current shape and checks if the part is active.
+	 *          If a part is active and has valid coordinates (i.e., both vertical and horizontal coordinates are non-negative),
+	 *          it sets the tile at the specified position to the brick's color and marks the tile as occupied.
+	 */
 	void draw();
 
+	/*
+	 * Resets all parts of the current brick in the game area.
+	 * @details This function iterates over each part of the brick and checks if its coordinates
+	 *          are valid (i.e., both vertical and horizontal coordinates are non-negative).
+	 *          If the part is part of the current shape and occupies a valid position in the game area,
+	 *          it calls `resetTile` to clear the corresponding tile.
+	 */
 	void reset_entire_brick();
 
+	//after the tests, move to private
+	/*
+	 * Attempts to move the brick down by one block if no collision is detected.
+	 * @details This function first checks for potential collisions with the game area border or other blocks.
+	 *          If no collision is found, it increments the vertical position of each part of the brick by one.
+	 * @return Returns true if the brick was successfully moved down; returns false if a collision was detected and the brick cannot move further.
+	 */
 	bool move_down();
 
+	//after the tests, move to private
+	/*
+	 * Attempts to move the brick one block to the left if no collision is detected.
+	 * @details This function checks for potential collisions on the left side of the brick.
+	 *          If no collision is detected, it decrements the horizontal position of each part by one.
+	 */
 	void move_left();
 
+	//after the tests, move to private
+	/*
+	 * Attempts to move the brick one block to the right if no collision is detected.
+	 * @details This function checks for potential collisions on the right side of the brick.
+	 *          If no collision is detected, it increments the horizontal position of each part by one.
+	 */
 	void move_right();
 
 	/*
@@ -96,13 +129,14 @@ public:
 	* Moves the block in the appropriate direction depending on which event in the QKeyEvent occurred
 	* Possible movements left, right, down
 	*/
-	void movement(QKeyEvent* event);
+	bool movement(QKeyEvent* event);
 
+	//after the tests, move to private
 	/*
 	* Method changes the value of the brick rotation field
 	* @param new_rotation new rotation we want to set
 	*/
-	void set_rotation(int new_rotation);
+	void change_rotation();
 
 	/*
 	* The collision method checks for potential collisions between a brick and other elements 
@@ -151,18 +185,29 @@ private:
 	void rotate270Degrees(point* Old_coordinates);
 
 	/*
-	 * Checks boundaries for the current rotation.
-	 * @return Return true if rotation is possible, false otherwise.
-	*/
-	bool checkBoundariesForRotation();
+	 * Checks for collision based on the temporary coordinates of the brick after rotation.
+	 * @param temp_coords Temporary coordinates of the brick after rotation.
+	 * @return Returns true if any part of the brick is visible and collides with another block or the board boundary; false otherwise.
+	 */
+	bool checkForCollision_Rotation(const point* temp_coords) const;
 
 	/*
-	* Checks for other blocks in the game area which may already occupy the space we are checking
-	* @return Return true if no collision with other blocks is detected, false otherwise.
+	 * Checks if a part of the brick will collide with the boundary of the game area or with other blocks.
+	 * @param index The index of the brick's part to be checked for collision.
+	 * @param offset_i The vertical offset applied to the brick's part.
+	 * @param offset_j The horizontal offset applied to the brick's part.
+	 * @return Returns true if a collision is detected with either the boundary or another block; returns false otherwise.
+	 */
+	bool checkForCollision_Movement(int index, int offset_i, int offset_j) const;
+
+	/*
+	* Increments the rotation state of the brick, cycling between 0 and 3.
+	* @details The brick rotation is represented as an integer from 0 to 3,
+	*          with each value corresponding to a specific orientation.
+	*          If the current rotation is less than 3, it increments by 1;
+	*          otherwise, it resets to 0, completing the cycle.
 	*/
-	bool checkForOtherBlocks() const;
-	
-	bool checkCollisionBoundary(int index, int offset_i, int offset_j) const;
+	void increment_rotation();
 
 };
 
