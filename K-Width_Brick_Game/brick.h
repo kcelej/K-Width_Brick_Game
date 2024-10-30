@@ -99,6 +99,33 @@ public:
 	 */
 	void reset_entire_brick();
 
+	/*
+	* Main idea
+	* Moves the block in the appropriate direction depending on which event in the QKeyEvent occurred
+	* Possible movements left, right, down
+	* True if another move possible
+	* False if touched smt under
+	*/
+	bool movement(QKeyEvent* event);
+
+	//for test only, delete later
+	bool movement(int key);
+
+	//after the tests, move to private
+	/*
+	* Method changes the value of the brick rotation field
+	* @param new_rotation new rotation we want to set
+	*/
+	void change_rotation();
+
+	/*
+	* The collision method checks for potential collisions between a brick and other elements 
+	* on the game board when the brick moves in a specific direction.
+	* @param direction integer value that tells which way the block is moving
+	* @return Return true if collision detected, false otherwise 
+	*/
+	bool collision (int direction);	// directions: 0 - down, 1 - left, 2 - right
+
 	//after the tests, move to private
 	/*
 	 * Attempts to move the brick down by one block if no collision is detected.
@@ -123,28 +150,6 @@ public:
 	 *          If no collision is detected, it increments the horizontal position of each part by one.
 	 */
 	void move_right();
-
-	/*
-	* Main idea
-	* Moves the block in the appropriate direction depending on which event in the QKeyEvent occurred
-	* Possible movements left, right, down
-	*/
-	bool movement(QKeyEvent* event);
-
-	//after the tests, move to private
-	/*
-	* Method changes the value of the brick rotation field
-	* @param new_rotation new rotation we want to set
-	*/
-	void change_rotation();
-
-	/*
-	* The collision method checks for potential collisions between a brick and other elements 
-	* on the game board when the brick moves in a specific direction.
-	* @param direction integer value that tells which way the block is moving
-	* @return Return true if collision detected, false otherwise 
-	*/
-	bool collision (int direction);	// directions: 0 - down, 1 - left, 2 - right
 
 	point coordinates[8];
 private:
@@ -191,14 +196,9 @@ private:
 	 */
 	bool checkForCollision_Rotation(const point* temp_coords) const;
 
-	/*
-	 * Checks if a part of the brick will collide with the boundary of the game area or with other blocks.
-	 * @param index The index of the brick's part to be checked for collision.
-	 * @param offset_i The vertical offset applied to the brick's part.
-	 * @param offset_j The horizontal offset applied to the brick's part.
-	 * @return Returns true if a collision is detected with either the boundary or another block; returns false otherwise.
-	 */
-	bool checkForCollision_Movement(int index, int offset_i, int offset_j) const;
+	bool checkForCollision_Movement_Brick(int index, int offset_i, int offset_j) const;
+
+	bool checkForCollision_Movement_Border(int index, int offset_i, int offset_j) const;
 
 	/*
 	* Increments the rotation state of the brick, cycling between 0 and 3.
@@ -208,6 +208,5 @@ private:
 	*          otherwise, it resets to 0, completing the cycle.
 	*/
 	void increment_rotation();
-
 };
 

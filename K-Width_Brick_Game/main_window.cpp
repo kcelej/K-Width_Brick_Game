@@ -37,7 +37,7 @@ void delayOneSecond()
         qDebug() << "1 second has passed.";
         });
 
-    timer.start(500);  // Start the timer with a 1-second interval
+    timer.start(1000);  // Start the timer with a 1-second interval
     QCoreApplication::processEvents(QEventLoop::AllEvents, 1000);
 
     // Process events until the timer times out
@@ -91,26 +91,32 @@ void main_window::on_testGameButton_clicked() {
         int how_many = 1;
         while (how_many <= 6) { //for now spawn only 6 blocks
             // example brick for testing
-            player = new brick(z++, 4, gameBoard);
+            player = new brick(z++, 2, gameBoard);
            // player = new brick(random(0, 6), random(0, 6), gameBoard);
             //player = new brick(random(0, 6), z++, gameBoard);
+
+            /*
+            0 ->
+            1 <-
+            2 /\
+            3 \/
+            */
 
             // example movement downwards for testing
             int i = 0;
             while (true) {
                 if (i == 0) {
-                    player->move_left();
-                    player->change_rotation();
-                    //doesn't work properly
-                    player->change_rotation();
-                    player->change_rotation();
-                    player->change_rotation();
-                    player->move_left();
-                    player->move_left();
-
+                    player->movement(2);
+                    delayOneSecond();
+                    player->movement(2);
+                    delayOneSecond();
+                    player->movement(1);
+                    delayOneSecond();
+                    player->movement(1);
+                    delayOneSecond();
                 }
                 if (i == 1) {
-                   // player->change_rotation();
+                    
                 }
                 if (i == 2) {
                     //player->change_rotation();
@@ -118,18 +124,18 @@ void main_window::on_testGameButton_clicked() {
                 if (i == 3) {
                   // player->change_rotation();
                 }
-                player->reset_entire_brick();
                 if (!player->move_down()) {
                     how_many++;
                     player->draw();
-                    player = nullptr; // memory leak FIX LATER!!!
+                    //player = nullptr; // memory leak FIX LATER!!!
+                    delete(player);
                     break;
                 }
 
                 //if (!(i % 4)) player->move_left();
                 //if (!(i % 4)) player->move_right();
                 ++i;
-                player->draw();    // changes the game board tiles to the brick shape
+                player->draw();
                 delayOneSecond();
             }
         }
