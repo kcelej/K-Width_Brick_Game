@@ -46,8 +46,7 @@ bool brick::movement(QKeyEvent* event) {
 	case Qt::Key_Down:
 		qDebug() << "Down arrow pressed";
 		reset_entire_brick();
-		move_down();
-		can_be_still_moved = false;
+		can_be_still_moved = move_down();
 		break;
 
 	case Qt::Key_Left:

@@ -20,8 +20,8 @@ private slots:
 
 //main concept for game loop
 // add fps = 60
-// while(!game_over() || victory()){
 //  int frame_passed = 0
+// while(!game_over() || victory()){
 //  Events()
 //  Update()
 //  Render()
