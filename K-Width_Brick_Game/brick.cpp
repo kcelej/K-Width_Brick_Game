@@ -982,10 +982,5 @@ void brick::move_right() {
 }
 
 void brick::increment_rotation() {
-	if (rotation + 1 < 4) {
-		rotation++;
-	}
-	else {
-		rotation = 0;
-	}
+	(rotation + 1 < 4) ? rotation++ : rotation = 0;
 }
