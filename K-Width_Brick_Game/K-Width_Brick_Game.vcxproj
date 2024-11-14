@@ -93,6 +93,7 @@
   </ItemDefinitionGroup>
   <ItemGroup>
     <ClCompile Include="brick.cpp" />
+    <ClCompile Include="Tetris_Game.cpp" />
     <ClCompile Include="tile.cpp" />
     <QtRcc Include="main_window.qrc" />
     <QtRcc Include="textures.qrc" />
@@ -107,6 +108,7 @@
   <ItemGroup>
     <ClInclude Include="board.h" />
     <ClInclude Include="brick.h" />
+    <ClInclude Include="Tetris_Game.h" />
     <ClInclude Include="tile.h" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />

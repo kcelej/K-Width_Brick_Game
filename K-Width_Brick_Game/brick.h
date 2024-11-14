@@ -80,7 +80,12 @@ public:
 
 
 	brick(int col, int sh, board* _b);
-	~brick() { b = nullptr; }
+	~brick() {
+		if (b) {
+			delete(b);
+			b = nullptr;
+		}
+	}
 
 	/*
 	 * Draws the brick on the game area grid by setting each part of the brick to its specified color and updating its status.

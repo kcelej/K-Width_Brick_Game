@@ -13,7 +13,6 @@
 
 #include <QKeyEvent>
 
-#include <QPixMap>
 #include <QGraphicsPixmapItem>
 #include <QTimer>
 

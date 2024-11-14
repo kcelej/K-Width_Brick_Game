@@ -3,6 +3,7 @@
 #include <QtWidgets/QMainWindow>
 #include "ui_main_window.h"
 
+
 class main_window : public QMainWindow
 {
     Q_OBJECT
@@ -18,6 +19,7 @@ private slots:
     void on_testGameButton_clicked();
 };
 
+//concept moved to new class Tetris_Game
 //main concept for game loop
 // add fps = 60
 //  int frame_passed = 0
