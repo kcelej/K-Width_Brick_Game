@@ -22,6 +22,12 @@ public:
 	void resetTile(int i, int j);
 	void changeTileStatus(int i, int j, bool b);
 
+	bool check_line(int j);
+	void delete_line(int j);
+	void move_all_down(int j);
+	void check_board();
+
+
 	friend class tile;
 };
 
