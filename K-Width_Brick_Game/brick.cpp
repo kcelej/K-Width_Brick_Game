@@ -10,7 +10,7 @@ brick::brick(int col, int sh, board* _b) : colour(col), shape(sh), rotation(0), 
 	}
 }
 
-void brick::draw() {
+void brick::draw() const {
 	for (int i = 0; i < 8; i++) {
 		// Check if the current part is active in the current shape
 		if (shapes[shape][i]) {
@@ -25,7 +25,7 @@ void brick::draw() {
 	}
 }
 
-void brick::reset_entire_brick() {
+void brick::reset_entire_brick() const{
 	for (int i = 0; i < 8; i++) {
 		// Check if the current part is visible
 		if (coordinates[i].i >= 0) {
@@ -35,8 +35,7 @@ void brick::reset_entire_brick() {
 	}
 }
 
-bool brick::movement(QKeyEvent* event) {
-	bool can_be_still_moved = true;
+void brick::movement(QKeyEvent* event) {
 	switch (event->key()) {
 	case Qt::Key_Up:
 		qDebug() << "Up arrow pressed";
@@ -65,18 +64,16 @@ bool brick::movement(QKeyEvent* event) {
 	}
 
 	draw();
-	return can_be_still_moved;
 }
 
 //Version for tests, delete later
-bool brick::movement(int key) {
+void brick::movement(int key) {
 	/*
 	0 ->
 	1 <-
 	2 /\
 	3 \/
 	*/
-	bool can_be_still_moved = true;
 	switch (key) {
 	case 2:
 		qDebug() << "Up arrow pressed";
@@ -104,7 +101,6 @@ bool brick::movement(int key) {
 	}
 
 	draw();
-	return can_be_still_moved;
 }
 
 void brick::change_rotation() {
@@ -907,7 +903,7 @@ bool brick::checkForCollision_Movement_Border(int index, int offset_i, int offse
 
 //NEW BETTER VERSION
 //Generally tested, it is not known whether there are any special exceptions
-bool brick::collision(int direction) {
+bool brick::collision(int direction) const{
 	int offset_i = 0, offset_j = 0;
 
 	switch (direction) {
@@ -983,4 +979,9 @@ void brick::move_right() {
 
 void brick::increment_rotation() {
 	(rotation + 1 < 4) ? rotation++ : rotation = 0;
+}
+
+void brick::onKeyPress(QKeyEvent* event) {
+	// Wywo³anie metody movement() przy wciœniêciu klawisza
+	movement(event);
 }

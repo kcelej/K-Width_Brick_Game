@@ -1,8 +1,10 @@
 #pragma once
 #include "board.h"
 
-class brick
-{
+class brick : public QWidget{
+
+	Q_OBJECT
+
 public:
 	/*
 	a brick is essentially a 2x4 sprite with tiles being printed wherever the boolean value is equal to 1 and a set of coordinates for each tile for movement tracking
@@ -80,9 +82,7 @@ public:
 
 
 	brick(int col, int sh, board* _b);
-	~brick() {
-		b = nullptr;
-	}
+	~brick() { b = nullptr; }
 
 	/*
 	 * Draws the brick on the game area grid by setting each part of the brick to its specified color and updating its status.
@@ -90,7 +90,7 @@ public:
 	 *          If a part is active and has valid coordinates (i.e., both vertical and horizontal coordinates are non-negative),
 	 *          it sets the tile at the specified position to the brick's color and marks the tile as occupied.
 	 */
-	void draw();
+	void draw() const;
 
 	/*
 	 * Resets all parts of the current brick in the game area.
@@ -99,7 +99,7 @@ public:
 	 *          If the part is part of the current shape and occupies a valid position in the game area,
 	 *          it calls `resetTile` to clear the corresponding tile.
 	 */
-	void reset_entire_brick();
+	void reset_entire_brick() const;
 
 	/*
 	* Main idea
@@ -108,10 +108,10 @@ public:
 	* True if another move possible
 	* False if touched smt under
 	*/
-	bool movement(QKeyEvent* event);
+	void movement(QKeyEvent* event);
 
 	//for test only, delete later
-	bool movement(int key);
+	void movement(int key);
 
 	//after the tests, move to private
 	/*
@@ -126,7 +126,7 @@ public:
 	* @param direction integer value that tells which way the block is moving
 	* @return Return true if collision detected, false otherwise 
 	*/
-	bool collision (int direction);	// directions: 0 - down, 1 - left, 2 - right
+	bool collision (int direction) const;	// directions: 0 - down, 1 - left, 2 - right
 
 	//after the tests, move to private
 	/*
@@ -154,6 +154,8 @@ public:
 	void move_right();
 
 	point coordinates[8];
+
+	bool can_be_still_moved = true;
 private:
 	int colour;	// sprite's colour
 	int shape; // sprite's shape
@@ -198,8 +200,37 @@ private:
 	 */
 	bool checkForCollision_Rotation(const point* temp_coords) const;
 
+	/*
+	 * Checks if a part of the brick will collide with another block in the game area
+	 * when moved by a specified offset.
+	 * @param index The index of the brick part (tile) to check.
+	 * @param offset_i The vertical offset to apply to the part's current position.
+	 * @param offset_j The horizontal offset to apply to the part's current position.
+	 * @return Returns `true` if a collision with another block is detected,
+	 *         `false` if no collision is found.
+	 * @details This method calculates the target coordinates of the specified brick part
+	 *          after applying the given vertical and horizontal offsets. It then checks
+	 *          if the target position is already occupied by another block in the game area.
+	 *          If a collision is detected (i.e., the target position is occupied),
+	 *          it returns `true`. Otherwise, it returns `false`.
+	 */
 	bool checkForCollision_Movement_Brick(int index, int offset_i, int offset_j) const;
 
+	/*
+	 * Checks if a part of the brick will collide with the borders of the game area
+	 * when moved by a specified offset.
+	 * @param index The index of the brick part (tile) to check.
+	 * @param offset_i The vertical offset to apply to the part's current position.
+	 * @param offset_j The horizontal offset to apply to the part's current position.
+	 * @return Returns `true` if a collision with the game area border is detected,
+	 *         `false` if no collision with the border is found.
+	 * @details This method calculates the target coordinates of the specified brick part
+	 *          after applying the given vertical and horizontal offsets. It then checks
+	 *          if the target coordinates go outside the boundaries of the game area.
+	 *          If the target position is outside the game area (either too low,
+	 *          or too far left/right), it returns `true` to indicate a border collision.
+	 *          Otherwise, it returns `false` to indicate no collision with the border.
+	 */
 	bool checkForCollision_Movement_Border(int index, int offset_i, int offset_j) const;
 
 	/*
@@ -210,5 +241,8 @@ private:
 	*          otherwise, it resets to 0, completing the cycle.
 	*/
 	void increment_rotation();
+
+public slots:
+	void onKeyPress(QKeyEvent* event); // Slot obs³uguj¹cy zdarzenie klawiatury
 };
 

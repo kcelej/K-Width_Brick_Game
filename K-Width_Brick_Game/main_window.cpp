@@ -1,49 +1,20 @@
 #include "main_window.h"
+#include "Tetris_Game.h"
 
 //Avoiding magic numbers, in future move to Defines.h file
 #define direction_down 0
 #define direction_left 1
 #define direction_right 2
 
+//delete later
 #include <QtWidgets>
-
-#include <QTimer>
-#include <QCoreApplication>
 #include <QDebug>
-
 #include <QKeyEvent>
-
 #include <QGraphicsPixmapItem>
 #include <QTimer>
-
 #include "brick.h"
 #include "board.h"
-
-//only for tests
-using namespace std;
-int z = 0;
-int brickTestOrder(int var) {
-    var++;
-    if (var > 7) var = 0;
-    return var;
-}
-
-void delayOneSecond()
-{
-    QTimer timer;
-    timer.setSingleShot(true);  // Set the timer to only trigger once
-    QObject::connect(&timer, &QTimer::timeout, []() {
-        qDebug() << "1 second has passed.";
-        });
-
-    timer.start(1000);  // Start the timer with a 1-second interval
-    QCoreApplication::processEvents(QEventLoop::AllEvents, 1000);
-
-    // Process events until the timer times out
-    while (timer.isActive()) {
-        QCoreApplication::processEvents(QEventLoop::AllEvents);
-    }
-}
+//
 
 main_window::main_window(QWidget *parent)
     : QMainWindow(parent)
@@ -55,17 +26,8 @@ main_window::~main_window()
 {
 }
 
-int random(int min, int max) // range: [min, max]
-{
-    static bool first = true;
-    if (first)
-    {
-        srand(time(NULL));
-        first = false;
-    }
-    return min + rand() % ((max + 1) - min);
-}
-
+//old
+/*
 void main_window::on_testGameButton_clicked() {
     try {
         QGraphicsScene* gameScene = new QGraphicsScene();
@@ -94,12 +56,12 @@ void main_window::on_testGameButton_clicked() {
            // player = new brick(random(0, 6), random(0, 6), gameBoard);
             //player = new brick(random(0, 6), z++, gameBoard);
 
-            /*
-            0 ->
-            1 <-
-            2 /\
-            3 \/
-            */
+            
+            //0 ->
+            //1 <-
+            //2 /\
+            //3 \/
+            
 
             // example movement downwards for testing
             int i = 0;
@@ -143,4 +105,14 @@ void main_window::on_testGameButton_clicked() {
     catch (...) {
         QMessageBox::information(this, "Error", "Error during game test");
     }
+}
+*/
+
+//new
+void main_window::on_testGameButton_clicked() {
+    Tetris_Game Tetris;
+    Tetris.Game();
+
+   //idk
+   return;
 }

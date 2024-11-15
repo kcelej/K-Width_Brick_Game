@@ -107,8 +107,9 @@
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="board.h" />
-    <ClInclude Include="brick.h" />
-    <ClInclude Include="Tetris_Game.h" />
+    <QtMoc Include="brick.h" />
+    <ClInclude Include="other_functions.h" />
+    <QtMoc Include="Tetris_Game.h" />
     <ClInclude Include="tile.h" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />

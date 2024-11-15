@@ -69,11 +69,16 @@
     <ClInclude Include="tile.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="brick.h">
+    <ClInclude Include="other_functions.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="Tetris_Game.h">
+  </ItemGroup>
+  <ItemGroup>
+    <QtMoc Include="Tetris_Game.h">
       <Filter>Header Files</Filter>
-    </ClInclude>
+    </QtMoc>
+    <QtMoc Include="brick.h">
+      <Filter>Header Files</Filter>
+    </QtMoc>
   </ItemGroup>
 </Project>
