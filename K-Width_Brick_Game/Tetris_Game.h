@@ -1,6 +1,4 @@
 #include <QtWidgets>
-#include <QTimer>
-#include <QCoreApplication>
 #include <QDebug>
 #include <QKeyEvent>
 #include <QGraphicsPixmapItem>
@@ -8,13 +6,13 @@
 #include "board.h"
 #include "brick.h"
 
-class Tetris_Game {
+/*
+class Tetris_Game : QWidget {
 public:
     Tetris_Game();
-
     ~Tetris_Game();
+    void Game();
 
-    bool Game();
 private:
     QGraphicsScene* gameScene = nullptr;
     QGraphicsView* gameView = nullptr;
@@ -22,9 +20,10 @@ private:
     board* gameBoard = nullptr;
     brick* player = nullptr;
 
-    void Events();
-    void Update();
-    void Render();
-};
+    void end_of_life_of_brick();
+    void add_new_brick();
 
-//Maybe a new class that is only responsible for the player's input? This class would be an element of the Tetris_Game class
+protected:
+    void keyPressEvent(QKeyEvent* key_event) override;
+};
+*/

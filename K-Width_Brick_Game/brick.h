@@ -81,10 +81,7 @@ public:
 
 	brick(int col, int sh, board* _b);
 	~brick() {
-		if (b) {
-			delete(b);
-			b = nullptr;
-		}
+		b = nullptr;
 	}
 
 	/*

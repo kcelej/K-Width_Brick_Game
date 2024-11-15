@@ -1,5 +1,6 @@
 #include "Tetris_Game.h"
 
+/*
 Tetris_Game::Tetris_Game() {
     gameScene = new QGraphicsScene();
     gameView = new QGraphicsView(gameScene);
@@ -19,45 +20,67 @@ Tetris_Game::Tetris_Game() {
     gameView->setHorizontalScrollBarPolicy(Qt::ScrollBarAlwaysOff);
     gameView->setVerticalScrollBarPolicy(Qt::ScrollBarAlwaysOff);
 
-    player = nullptr;
+    add_new_brick();
 };
 
 Tetris_Game::~Tetris_Game() {
     if (gameScene) {
-        delete(gameScene);
-        QGraphicsScene* gameScene = nullptr;
+        delete gameScene;
+        qDebug() << "Deleted gameScene";
     }
     if (gameView) {
-        delete(gameView);
-        QGraphicsView* gameView = nullptr;
+        delete gameView;
+        qDebug() << "Deleted gameView";
     }
     if (backgroundImageItem) {
-        delete(backgroundImageItem);
-        QGraphicsPixmapItem* backgroundImageItem = nullptr;
+        delete backgroundImageItem;
+        qDebug() << "Deleted backgroundImageItem";
     }
     if (gameBoard) {
-        delete(gameBoard);
-        board* gameBoard = nullptr;
+        delete gameBoard;
+        qDebug() << "Deleted gameBoard";
     }
     if (player) {
-        delete(player);
-        brick* player = nullptr;
+        delete player;
+        qDebug() << "Deleted player";
     }
 }
 
-void Tetris_Game::Events() {
+void Tetris_Game::Game() {
+
+    while (true) {
+        //movement
+        if (player) {
+            QApplication::processEvents();
+        }
+        
+    }
 
 }
 
-void Tetris_Game::Update() {
-
+void Tetris_Game::keyPressEvent(QKeyEvent* event){
+    if (player) {
+        qDebug() << "Brick accepted input";
+        player->movement(event);
+    }
+    else qDebug() << "No brick to make movement";
 }
 
-void Tetris_Game::Render() {
-
+void Tetris_Game::end_of_life_of_brick() {
+    //delete
+    if (player) {
+        delete(player);
+        qDebug() << "Brick deleted";
+    }
+    else qDebug() << "No Brick to delete";
 }
 
-bool Tetris_Game::Game() {
-
-    return true;
+void Tetris_Game::add_new_brick() {
+    //add new brick
+    if (!player) {
+        player = new brick(random(0, 6), random(0, 6), gameBoard);
+        qDebug() << "Added new brick";
+    }
+    else qDebug() << "Cannot add a new brick";
 }
+*/
