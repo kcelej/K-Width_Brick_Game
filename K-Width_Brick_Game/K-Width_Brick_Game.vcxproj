@@ -108,6 +108,7 @@
   <ItemGroup>
     <ClInclude Include="board.h" />
     <QtMoc Include="brick.h" />
+    <ClInclude Include="Defines.h" />
     <ClInclude Include="other_functions.h" />
     <QtMoc Include="Tetris_Game.h" />
     <ClInclude Include="tile.h" />

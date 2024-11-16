@@ -1,3 +1,4 @@
+#pragma once
 #include "brick.h"
 
 brick::brick(int col, int sh, board* _b) : color(col), shape(sh), rotation(0), b(_b) {
@@ -936,7 +937,7 @@ bool brick::collision(int direction) const{
 bool brick::move_down() {
 	reset_entire_brick();
 	// Check for collision with the border or other blocks below
-	if (!collision(0)) {
+	if (!collision(DIRECTION_DOWN)) {
 		// No collision detected, move each part of the brick down by one block
 		for (int tile = 0; tile < ALL_TILES; tile++) {
 			coordinates[tile].i++;
@@ -952,7 +953,7 @@ bool brick::move_down() {
 void brick::move_left() {
 	reset_entire_brick();
 	// Check for collision with the border or other blocks to the left
-	if (!collision(1)) {
+	if (!collision(DIRECTION_LEFT)) {
 		// No collision detected, move each part of the brick one block to the left
 		for (int tile = 0; tile < ALL_TILES; tile++) {
 			coordinates[tile].j--;
@@ -965,7 +966,7 @@ void brick::move_left() {
 void brick::move_right() {
 	reset_entire_brick();
 	// Check for collision with the border or other blocks to the right
-	if (!collision(2)) {
+	if (!collision(DIRECTION_RIGHT)) {
 		// No collision detected, move each part of the brick one block to the right
 		for (int tile = 0; tile < ALL_TILES; tile++) {
 			coordinates[tile].j++;

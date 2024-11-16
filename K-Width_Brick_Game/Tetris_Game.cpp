@@ -1,3 +1,4 @@
+#pragma once
 #include "Tetris_Game.h"
 #include "other_functions.h"
 

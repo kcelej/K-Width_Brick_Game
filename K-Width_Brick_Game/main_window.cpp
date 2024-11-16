@@ -1,11 +1,6 @@
 #include "main_window.h"
 #include "Tetris_Game.h"
 
-//Avoiding magic numbers, in future move to Defines.h file
-#define direction_down 0
-#define direction_left 1
-#define direction_right 2
-
 //delete later
 #include <QtWidgets>
 #include <QDebug>

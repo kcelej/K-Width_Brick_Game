@@ -1,3 +1,4 @@
+#pragma once
 #include "board.h"
 
 
@@ -7,13 +8,13 @@ board::board(QGraphicsScene* scene, QGraphicsView* view) {
 	for (int i = 0; i < GAME_AREA_HEIGHT; i++) {
 		for (int j = 0; j < GAME_AREA_WIDTH; j++) {
 			tile* activeTile = new tile(boardX, boardY);
-			boardX += tileSize;
+			boardX += TILE_SIZE;
 
 			gameArea[i][j] = activeTile;
 			scene->addItem(activeTile->getPtr());
 		}
 		boardX = 28;
-		boardY += tileSize;
+		boardY += TILE_SIZE;
 	}
 }
 
@@ -22,7 +23,7 @@ void board::changeTile(int i, int j, int color) {
 	if (i >= 0 && i < GAME_AREA_HEIGHT && j >= 0 && j < GAME_AREA_WIDTH && gameArea[i][j] != nullptr) {
 		QPixmap tileset(":/resources/textures/tiles.png");
 		if (!tileset.isNull()) {
-			QRect rectangle(color * tileSize, 0, tileSize, tileSize);
+			QRect rectangle(color * TILE_SIZE, 0, TILE_SIZE, TILE_SIZE);
 			QPixmap cutTexture = tileset.copy(rectangle);
 			gameArea[i][j]->getPtr()->setPixmap(cutTexture);
 			gameArea[i][j]->set_color(color);
@@ -50,7 +51,7 @@ void board::resetTile(int i, int j) {
 	if (i >= 0 && i < GAME_AREA_HEIGHT && j >= 0 && j < GAME_AREA_WIDTH && gameArea[i][j] != nullptr) {
 		QPixmap tileset(":/resources/textures/empty_tile.png");
 		if (!tileset.isNull()) {
-			QRect rectangle(tileSize, 0, tileSize, tileSize);
+			QRect rectangle(TILE_SIZE, 0, TILE_SIZE, TILE_SIZE);
 			QPixmap cutTexture = tileset.copy(rectangle);
 			gameArea[i][j]->getPtr()->setPixmap(cutTexture);
 			changeTileStatus(i, j, false);

@@ -1,9 +1,8 @@
 #pragma once
-
 #include <QPixMap>
 #include <QGraphicsPixmapItem>
+#include "Defines.h"
 
-const int tileSize = 18;	// tile size in pixels (one side of a square)
 
 class tile
 {

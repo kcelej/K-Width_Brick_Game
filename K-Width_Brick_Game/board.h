@@ -2,10 +2,6 @@
 #include <QtWidgets>
 #include "tile.h"
 
-//Avoiding magic numbers, in future move to Defines.h file
-#define GAME_AREA_HEIGHT 20
-#define GAME_AREA_WIDTH 10
-
 // GAME WINDOW DATA:
 const int gameWindowHeight = 480;	// height of the game window (in pixels)
 const int gameWindowWidth = 320;	// width of the game window (in pixels)

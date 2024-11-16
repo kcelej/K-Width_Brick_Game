@@ -7,7 +7,7 @@ tile::tile(int x, int y) : ptr(nullptr), isOccupied(0), color(3) {
 
 	QPixmap tileset(":/resources/textures/empty_tile.png");
 	if (!tileset.isNull()) {
-		QRect rectangle(tileSize, 0, tileSize, tileSize);
+		QRect rectangle(TILE_SIZE, 0, TILE_SIZE, TILE_SIZE);
 		QPixmap cutTexture = tileset.copy(rectangle);
 		ptr = new QGraphicsPixmapItem();
 

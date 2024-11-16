@@ -1,9 +1,6 @@
 #pragma once
 #include "board.h"
 
-//Avoiding magic numbers, in future move to Defines.h file
-#define ALL_TILES 8
-
 class brick : public QWidget{
 
 	Q_OBJECT
