@@ -154,9 +154,9 @@ void Tetris_Game::add_new_brick() {
     // Adds a new brick if there is no active brick currently.
     if (!player) {
         // Create a new brick with random properties, and assign it to the player pointer.
-        //player = new brick(random(0, 7), random(0, 6), gameBoard);
+        player = new brick(random(0, 7), random(0, 6), gameBoard);
         //for tests only
-        player = new brick(random(0, 7), 0, gameBoard);
+        //player = new brick(random(0, 7), 0, gameBoard);
 
         // Uncomment the following line and fix the issue to connect the keyboard input to the brick's handler.
         // QObject::connect(this, &Tetris_Game::keyPressd, player, &brick::onKeyPress);

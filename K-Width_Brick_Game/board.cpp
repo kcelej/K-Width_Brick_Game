@@ -93,7 +93,10 @@ void board::move_all_down(int i) {
 	qDebug() << "Moving the lines.";
 	for (int row = i; row >= 0; row--) {
 		// If the row above does not exist (topmost row) or the row above is fully empty, delete the current row.
-		if (row - 1 < 0 || check_line_condition(row - 1, false)) delete_line(row);
+		if (row - 1 < 0 || check_line_condition(row - 1, false)) {
+			delete_line(row);
+			break;
+		}
 		else {
 			for (int j = 0; j < GAME_AREA_WIDTH; j++) {
 				if (gameArea[row - 1][j]->getIsOccupied()) {
