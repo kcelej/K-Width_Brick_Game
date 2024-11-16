@@ -59,10 +59,9 @@ void Tetris_Game::Game() {
 
     int frameCounter = 0; // Frame counter to track the number of frames elapsed.
 
+    int temp = 1;
     // Main loop to spawn and control a limited number of blocks (currently limited to 6).
     while (how_many <= 6) {
-        int i = 0; // Local counter used for specific conditional logic.
-
         // Inner loop to control the active player block.
         while (player) {
             if (!player->can_be_still_moved) {
@@ -74,19 +73,27 @@ void Tetris_Game::Game() {
                 break; // Exit the inner loop to spawn a new block.
             }
 
-            if (i == 10) {
-                // Example logic for additional movements after specific conditions.
-                player->movement(2); 
-                waitForNextFrame(timer, frameDelay); // Wait for the next frame.
-                player->movement(2); 
-                waitForNextFrame(timer, frameDelay);
-                player->movement(1); 
-                waitForNextFrame(timer, frameDelay);
-                player->movement(1); 
-                waitForNextFrame(timer, frameDelay);
+           //make a line for line deletion test
+            if (how_many == 1 && temp == 1) {
+                temp++;
+                player->movement(2);
+                player->movement(1);
+                player->movement(1);
+                player->movement(1);
+                player->movement(1);
             }
-
-            ++i; // Increment the local counter.
+            if (how_many == 3 && temp == 2) {
+                temp++;
+                player->movement(0);
+            }
+            if (how_many == 4 && temp == 3) {
+                temp++;
+                player->movement(2);
+                player->movement(0);
+                player->movement(0);
+                player->movement(0);
+                player->movement(0);
+            }
 
             if (frameCounter++ >= 60) {
                 // If 60 frames have elapsed (approximately 1 second at 60 FPS):
@@ -97,8 +104,8 @@ void Tetris_Game::Game() {
             player->draw(); // Redraw the current state of the block.
             waitForNextFrame(timer, frameDelay); // Wait for the next frame to maintain FPS.
         }
-
         // After the inner loop, spawn a new block.
+        gameBoard->check_board();
         add_new_brick();
         player->draw(); // Draw the new block.
     }
@@ -131,7 +138,9 @@ void Tetris_Game::add_new_brick() {
     // Adds a new brick if there is no active brick currently.
     if (!player) {
         // Create a new brick with random properties, and assign it to the player pointer.
-        player = new brick(random(0, 6), random(0, 6), gameBoard);
+        //player = new brick(random(0, 6), random(0, 6), gameBoard);
+        //for tests only
+        player = new brick(random(0, 6), 0, gameBoard);
 
         // Uncomment the following line and fix the issue to connect the keyboard input to the brick's handler.
         // QObject::connect(this, &Tetris_Game::keyPressd, player, &brick::onKeyPress);

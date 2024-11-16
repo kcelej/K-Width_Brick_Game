@@ -338,7 +338,7 @@ bool brick::rotate() {
 	// Save the old coordinates temporarily
 	point Tmp_coordinates[8];
 	for (int i = 0; i < 8; ++i) {
-		Tmp_coordinates[i].copy_coordinates(&coordinates[i]);
+		Tmp_coordinates[i].copy_coordinates(coordinates[i]);
 	}
 
 	// Perform rotation based on the current rotation value
@@ -368,7 +368,7 @@ bool brick::rotate() {
 
 	// If there are no collisions assign new positions 
 	for (int i = 0; i < 8; ++i) {
-		coordinates[i].copy_coordinates(&Tmp_coordinates[i]);
+		coordinates[i].copy_coordinates(Tmp_coordinates[i]);
 	}
 
 	qDebug() << "Rotation possible and done.";

@@ -42,9 +42,9 @@ public:
 
 		point() : i(0), j(0) {}
 
-		point copy_coordinates(point* old) {
-			this->i = old->i;
-			this->j = old->j;
+		point& copy_coordinates(const point& old) {
+			this->i = old.i;
+			this->j = old.j;
 			return *this;
 		}
 	};	// basic coordinates i = 0, j = 0, changed later in the brick constructor to invisible in the game area

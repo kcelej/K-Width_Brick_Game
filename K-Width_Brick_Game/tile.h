@@ -18,5 +18,12 @@ public:
 	QGraphicsPixmapItem* getPtr();
 	bool getIsOccupied();
 	void changeTileStatus(bool b);
+
+	tile& copy_values(const tile* old) {
+		this->ptr = old->ptr;
+		this->isOccupied = old->isOccupied;	
+		this->colour = old->colour;
+		return *this;
+	}
 };
 
