@@ -153,11 +153,24 @@ public:
 	 */
 	void move_right();
 
+	/*
+	 * Checks if the brick has caused a defeat condition by being placed above the playable area of the board.
+	 * This occurs when any part of the brick's coordinates is above the top boundary of the board.
+	 *
+	 * @return Returns true if any part of the brick is positioned above the board's top row (i.e., with a negative row index);
+	 *         otherwise, returns false.
+	 */
+	bool chceck_for_defeat();
+
 	point coordinates[8];
 
 	bool can_be_still_moved = true;
+
+	int get_color() const { return color; }
+
+	bool get_tile_presence(const int tile) const { return shapes[shape][tile]; }
 private:
-	int colour;	// sprite's colour
+	int color;	// sprite's colour
 	int shape; // sprite's shape
 	int rotation; // (all rotations are done clockwise): 0 - default, 1 - 90deg, 2 - 180deg, 3 - 270deg
 	board* b = nullptr; // pointer to board

@@ -23,11 +23,15 @@ public:
 	void changeTileStatus(int i, int j, bool b);
 
 	/*
-	 * Checks if a specific line in the game area is fully occupied.
+	 * Checks whether a specific line in the game area meets a given condition (fully occupied or fully empty).
+	 *
 	 * @param i The index of the line (row) to check in the game area.
-	 * @return Returns true if the line is completely filled with occupied cells; false otherwise.
+	 * @param check_for_occupied A boolean that determines the condition to check:
+	 *                           - true: Checks if the line is fully occupied.
+	 *                           - false: Checks if the line is fully empty.
+	 * @return Returns true if the line satisfies the specified condition; false otherwise.
 	 */
-	bool check_line(int i);
+	bool check_line_condition(int i, bool check_for_occupied);
 
 	/*
 	 * Deletes all tiles in a specific line (row) of the game area.
@@ -36,7 +40,14 @@ public:
 	 */
 	void delete_line(int i);
 
-
+	/*
+	 * Moves all rows on the board down starting from a specified row.
+	 * This process shifts the contents of rows downward, effectively clearing the specified row and replacing it with the contents of the row above.
+	 * If there is no row above (at the top of the board), the current row is deleted.
+	 *
+	 * @param i The index of the starting row from which to begin shifting rows downward.
+	 *          All rows from this index up to the top of the board are affected.
+	 */
 	void move_all_down(int i);
 
 	/*
@@ -45,7 +56,6 @@ public:
 	 * If a line is fully occupied, it is deleted, and all lines above it are shifted down.
 	 */
 	void check_board();
-
 
 	friend class tile;
 };

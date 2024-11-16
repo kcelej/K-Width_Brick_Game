@@ -63,17 +63,20 @@ void board::resetTile(int i, int j) {
 	}
 }
 
-bool board::check_line(int i) {
-	qDebug() << "Checking the lines.";
+bool board::check_line_condition(int i, bool check_for_occupied) {
+	qDebug() << "Checking the line with condition:" << (check_for_occupied ? "Occupied" : "Empty");
 	for (int j = 0; j < Game_Area_Width; j++) {
-		if (!gameArea[i][j]->getIsOccupied()) {
-			// There is an unoccupied space in the line, no need to check further.
+		bool is_occupied = gameArea[i][j]->getIsOccupied();
+		if (check_for_occupied && !is_occupied) {
 			qDebug() << "The line contains blanks.";
-			return false;
+			return false; // The line is not fully occupied.
+		}
+		if (!check_for_occupied && is_occupied) {
+			qDebug() << "The line contains bricks.";
+			return false; // The line is not fully empty.
 		}
 	}
-	// All cells in the line are occupied, the line can be deleted.
-	qDebug() << "Full line.";
+	qDebug() << (check_for_occupied ? "Full line occupied." : "Full line empty.");
 	return true;
 }
 
@@ -84,17 +87,17 @@ void board::delete_line(int i) {
 	}
 }
 
-//So far, it is not visibly moving the blocks
-//fix it later
 void board::move_all_down(int i) {
 	qDebug() << "Moving the lines.";
 	for (int row = i; row >= 0; row--) {
-		//if the line above ours does not exist then delete the line
-		if (row - 1 < 0) delete_line(row);
+		// If the row above does not exist (topmost row) or the row above is fully empty, delete the current row.
+		if (row - 1 < 0 || check_line_condition(row - 1, false)) delete_line(row);
 		else {
 			for (int j = 0; j < Game_Area_Width; j++) {
-				//we change the assignment of indicators 
-				gameArea[row][j]->copy_values(gameArea[row - 1][j]);
+				if (gameArea[row - 1][j]->getIsOccupied()) {
+					changeTileStatus(row, j, true);
+					changeTile(row, j, gameArea[row - 1][j]->get_color());
+				}
 			}
 		}
 	}
@@ -105,7 +108,7 @@ void board::check_board() {
 	// Start checking from the bottom-most row and move upward.
 	for (int i = Game_Area_Height - 1; i >= 0; i--) {
 		// Continue checking the same row while it is completely filled.
-		while (check_line(i)) {
+		while (check_line_condition(i, true)) {
 			// The line is full and can be removed.
 			delete_line(i);
 			// Shift all lines above the deleted line one row down.

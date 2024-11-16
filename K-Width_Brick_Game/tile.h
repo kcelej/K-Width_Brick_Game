@@ -10,7 +10,7 @@ class tile
 private:
 	QGraphicsPixmapItem* ptr;	// pointer to the tile QGraphicsItem object
 	bool isOccupied;	// is the tile occupied (0 - no, 1 - yes)
-	int colour;	// the colour of the tile (values: 0-7)
+	int color;	// the colour of the tile (values: 0-7)
 public:
 	tile();
 	tile(int x, int y);
@@ -18,12 +18,6 @@ public:
 	QGraphicsPixmapItem* getPtr();
 	bool getIsOccupied();
 	void changeTileStatus(bool b);
-
-	tile& copy_values(const tile* old) {
-		this->ptr = old->ptr;
-		this->isOccupied = old->isOccupied;	
-		this->colour = old->colour;
-		return *this;
-	}
+	int get_color() { return color; }
 };
 

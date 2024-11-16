@@ -32,10 +32,6 @@ Tetris_Game::~Tetris_Game() {
         delete gameView;
         qDebug() << "Deleted gameView";
     }
-    if (backgroundImageItem) {
-        delete backgroundImageItem;
-        qDebug() << "Deleted backgroundImageItem";
-    }
     if (gameBoard) {
         delete gameBoard;
         qDebug() << "Deleted gameBoard";
@@ -53,23 +49,23 @@ void Tetris_Game::Game() {
 
     const int targetFPS = 60; // Target frames per second for the game.
     const int frameDelay = 1000 / targetFPS; // Duration of one frame in milliseconds.
-
     QElapsedTimer timer; // Timer to measure the elapsed time between frames.
     timer.start(); // Start the timer.
-
     int frameCounter = 0; // Frame counter to track the number of frames elapsed.
 
     int temp = 1;
-    // Main loop to spawn and control a limited number of blocks (currently limited to 6).
-    while (how_many <= 6) {
+
+    // Main loop
+    while (!game_ended) {
         // Inner loop to control the active player block.
         while (player) {
+
             if (!player->can_be_still_moved) {
-                // If the current block can no longer be moved:
+
                 how_many++; // Increment the number of blocks processed.
-                player->draw(); // Draw the final state of the current block.
-                // player = nullptr; // Placeholder to avoid memory leaks (FIX LATER).
-                end_of_life_of_brick(); // Perform cleanup and transition to the next block.
+
+                // If the current block can no longer be moved:
+                place_brick(game_ended);
                 break; // Exit the inner loop to spawn a new block.
             }
 
@@ -94,6 +90,22 @@ void Tetris_Game::Game() {
                 player->movement(0);
                 player->movement(0);
             }
+            if (how_many == 5 && temp == 4) {
+                temp++;
+                player->movement(2);
+                player->movement(1);
+                player->movement(1);
+                player->movement(1);
+                player->movement(1);
+            }
+            if (how_many == 6 && temp == 5) {
+                temp++;
+                player->movement(2);
+                player->movement(0);
+                player->movement(0);
+                player->movement(0);
+                player->movement(0);
+            }
 
             if (frameCounter++ >= 60) {
                 // If 60 frames have elapsed (approximately 1 second at 60 FPS):
@@ -104,11 +116,14 @@ void Tetris_Game::Game() {
             player->draw(); // Redraw the current state of the block.
             waitForNextFrame(timer, frameDelay); // Wait for the next frame to maintain FPS.
         }
-        // After the inner loop, spawn a new block.
+  
+        if (game_ended) break;
+        // After the inner loop, chceck board.
         gameBoard->check_board();
+        // After the inner loop, spawn a new block.
         add_new_brick();
-        player->draw(); // Draw the new block.
     }
+    qDebug() << "Game ended";
 }
 
 void Tetris_Game::waitForNextFrame(QElapsedTimer& timer, int frameDelay) {
@@ -150,6 +165,19 @@ void Tetris_Game::add_new_brick() {
     else {
         qDebug() << "Cannot add a new brick"; // Log if a new brick cannot be added because one already exists.
     }
+}
+
+void Tetris_Game::place_brick(bool& game_ended) {
+    // Check if the brick exceeds the upper boundary of the board, causing a defeat condition.
+    game_ended = player->chceck_for_defeat();
+
+    if (!game_ended) {
+        // If the game has not ended, place the brick's tiles on the board.
+        player->draw();
+    }
+
+    // Perform cleanup for the current brick and prepare for the next one.
+    end_of_life_of_brick();
 }
 
 void Tetris_Game::keyPressEvent(QKeyEvent* event) {

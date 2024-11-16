@@ -1,9 +1,9 @@
 #include "tile.h"
 
-tile::tile() : ptr(nullptr), isOccupied(0), colour(0) {}
+tile::tile() : ptr(nullptr), isOccupied(0), color(0) {}
 
 
-tile::tile(int x, int y) : ptr(nullptr), isOccupied(0), colour(3) {
+tile::tile(int x, int y) : ptr(nullptr), isOccupied(0), color(3) {
 
 	QPixmap tileset(":/resources/textures/empty_tile.png");
 	if (!tileset.isNull()) {

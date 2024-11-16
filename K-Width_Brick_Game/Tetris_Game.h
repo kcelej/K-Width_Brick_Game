@@ -49,6 +49,16 @@ private:
      */
     void add_new_brick();
 
+    /*
+     * Places the current brick on the game board, updating the board's state.
+     * Checks if the brick has caused a defeat condition before placing it.
+     * If the brick is successfully placed, its tiles are marked on the board with the appropriate color and status.
+     *
+     * @param game_ended A reference to a boolean that indicates whether the game has ended.
+     *                   This is set to true if the brick is positioned above the board's top boundary.
+     */
+    void place_brick(bool& game_ended);
+
 signals:
     void keyPressed(QKeyEvent* event); // Signal emitted when a key is pressed
 };
