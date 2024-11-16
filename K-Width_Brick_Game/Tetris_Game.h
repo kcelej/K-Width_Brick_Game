@@ -16,16 +16,12 @@ public:
     ~Tetris_Game(); // Destructor for cleaning up resources
     void Game();    // Main game loop
 
-protected:
-    void keyPressEvent(QKeyEvent* event) override; // Przechwytywanie zdarzeñ klawiatury
-
 private:
     QGraphicsScene* gameScene = nullptr;              // Pointer to the game scene for rendering
     QGraphicsView* gameView = nullptr;                // Pointer to the view used to display the game scene
     QGraphicsPixmapItem* backgroundImageItem = nullptr; // Pointer to the background image item
     board* gameBoard = nullptr;                       // Pointer to the game board object
     brick* player = nullptr;                          // Pointer to the current player brick (falling piece)
-
 
     void waitForNextFrame(QElapsedTimer& timer, int frameDelay);
 
@@ -58,7 +54,4 @@ private:
      *                   This is set to true if the brick is positioned above the board's top boundary.
      */
     void place_brick(bool& game_ended);
-
-signals:
-    void keyPressed(QKeyEvent* event); // Signal emitted when a key is pressed
 };

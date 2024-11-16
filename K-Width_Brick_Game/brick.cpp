@@ -2,7 +2,7 @@
 
 brick::brick(int col, int sh, board* _b) : color(col), shape(sh), rotation(0), b(_b) {
 	// Initialize the initial position of each brick above the game area
-	for (int tile = 0; tile < 8; ++tile) {
+	for (int tile = 0; tile < ALL_TILES; ++tile) {
 		// Set coordinate i: -4 for the first two elements, -3 for the next two, and so on
 		coordinates[tile].i = -4 + tile / 2;
 		// Set coordinate j: 4 for even indices, 5 for odd indices
@@ -11,13 +11,13 @@ brick::brick(int col, int sh, board* _b) : color(col), shape(sh), rotation(0), b
 }
 
 void brick::draw() const {
-	for (int tile = 0; tile < 8; tile++) {
+	for (int tile = 0; tile < ALL_TILES; tile++) {
 		// Check if the current part is active in the current shape
 		if (get_tile_presence(tile)) {
 			// Verify that the coordinates are within valid range
 			if (coordinates[tile].i >= 0 && coordinates[tile].j >= 0) {
 				// Set the tile to the brick's color
-				b->changeTile(coordinates[tile].i, coordinates[tile].j, this->color);
+				b->changeTile(coordinates[tile].i, coordinates[tile].j, color);
 				// Mark the tile as occupied
 				b->changeTileStatus(coordinates[tile].i, coordinates[tile].j, true);
 			}
@@ -26,7 +26,7 @@ void brick::draw() const {
 }
 
 void brick::reset_entire_brick() const{
-	for (int tile = 0; tile < 8; tile++) {
+	for (int tile = 0; tile < ALL_TILES; tile++) {
 		// Check if the current part is visible
 		if (coordinates[tile].i >= 0) {
 			// If the part exists in the current shape, reset its tile in the game area
@@ -336,8 +336,8 @@ bool brick::rotate() {
 	if (shape == 1) return false; //no need to rotate O
 
 	// Save the old coordinates temporarily
-	point Tmp_coordinates[8];
-	for (int tile = 0; tile < 8; ++tile) {
+	point Tmp_coordinates[ALL_TILES];
+	for (int tile = 0; tile < ALL_TILES; ++tile) {
 		Tmp_coordinates[tile].copy_coordinates(coordinates[tile]);
 	}
 
@@ -367,7 +367,7 @@ bool brick::rotate() {
 	}
 
 	// If there are no collisions assign new positions 
-	for (int tile = 0; tile < 8; ++tile) {
+	for (int tile = 0; tile < ALL_TILES; ++tile) {
 		coordinates[tile].copy_coordinates(Tmp_coordinates[tile]);
 	}
 
@@ -376,7 +376,7 @@ bool brick::rotate() {
 }
 
 bool brick::checkForCollision_Rotation(const point* temp_coords) const {
-	for (int tile = 0; tile < 8; tile++) {
+	for (int tile = 0; tile < ALL_TILES; tile++) {
 		// Check if the current brick part is part of the shape and has visible coordinates
 		// If the coordinates are out of the game window or occupied by another block, it indicates a collision
 		if (get_tile_presence(tile) && temp_coords[tile].i >= 0 && temp_coords[tile].j >= 0 &&
@@ -897,7 +897,7 @@ bool brick::checkForCollision_Movement_Border(int index, int offset_i, int offse
 	int target_j = coordinates[index].j + offset_j;
 
 	// Check if the target coordinates are outside the game area boundaries
-	if (target_i >= Game_Area_Height || target_j < 0 || target_j >= Game_Area_Width) {
+	if (target_i >= GAME_AREA_HEIGHT || target_j < 0 || target_j >= GAME_AREA_WIDTH) {
 		qDebug() << "Collision with border.";
 		return true;
 	}
@@ -919,7 +919,7 @@ bool brick::collision(int direction) const{
 	}
 
 	//Check collision with border for each part of the brick
-	for (int tile = 0; tile < 8; tile++) {
+	for (int tile = 0; tile < ALL_TILES; tile++) {
 		if (get_tile_presence(tile)) {
 			if (checkForCollision_Movement_Border(tile, offset_i, offset_j)) {
 				return true; // Collision detected
@@ -938,7 +938,7 @@ bool brick::move_down() {
 	// Check for collision with the border or other blocks below
 	if (!collision(0)) {
 		// No collision detected, move each part of the brick down by one block
-		for (int tile = 0; tile < 8; tile++) {
+		for (int tile = 0; tile < ALL_TILES; tile++) {
 			coordinates[tile].i++;
 		}
 		// Brick successfully moved down
@@ -954,7 +954,7 @@ void brick::move_left() {
 	// Check for collision with the border or other blocks to the left
 	if (!collision(1)) {
 		// No collision detected, move each part of the brick one block to the left
-		for (int tile = 0; tile < 8; tile++) {
+		for (int tile = 0; tile < ALL_TILES; tile++) {
 			coordinates[tile].j--;
 		}
 		qDebug() << "Moved to the left.";
@@ -967,7 +967,7 @@ void brick::move_right() {
 	// Check for collision with the border or other blocks to the right
 	if (!collision(2)) {
 		// No collision detected, move each part of the brick one block to the right
-		for (int tile = 0; tile < 8; tile++) {
+		for (int tile = 0; tile < ALL_TILES; tile++) {
 			coordinates[tile].j++;
 		}
 		qDebug() << "Moved to the right.";
@@ -976,7 +976,7 @@ void brick::move_right() {
 }
 
 bool brick::chceck_for_defeat() {
-	for (int tile = 0; tile < 8; tile++) {
+	for (int tile = 0; tile < ALL_TILES; tile++) {
 		if (coordinates[tile].i < 0) {
 			// A part of the brick is above the board, indicating a defeat condition.
 			return true;
@@ -988,9 +988,4 @@ bool brick::chceck_for_defeat() {
 
 void brick::increment_rotation() {
 	(rotation + 1 < 4) ? rotation++ : rotation = 0;
-}
-
-void brick::onKeyPress(QKeyEvent* event) {
-	// Wywo³anie metody movement() przy wciœniêciu klawisza
-	movement(event);
 }

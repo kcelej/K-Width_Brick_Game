@@ -1,6 +1,9 @@
 #pragma once
 #include "board.h"
 
+//Avoiding magic numbers, in future move to Defines.h file
+#define ALL_TILES 8
+
 class brick : public QWidget{
 
 	Q_OBJECT
@@ -162,7 +165,7 @@ public:
 	 */
 	bool chceck_for_defeat();
 
-	point coordinates[8];
+	point coordinates[ALL_TILES];
 
 	bool can_be_still_moved = true;
 
@@ -254,8 +257,5 @@ private:
 	*          otherwise, it resets to 0, completing the cycle.
 	*/
 	void increment_rotation();
-
-public slots:
-	void onKeyPress(QKeyEvent* event); // Slot obs³uguj¹cy zdarzenie klawiatury
 };
 

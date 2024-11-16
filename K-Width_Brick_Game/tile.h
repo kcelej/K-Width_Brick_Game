@@ -19,5 +19,8 @@ public:
 	bool getIsOccupied();
 	void changeTileStatus(bool b);
 	int get_color() { return color; }
+	void set_color(int c) {
+		if (c >= 0 && c <= 7) color = c;
+	}
 };
 
