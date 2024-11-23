@@ -11,7 +11,7 @@ class board
 {
 public:
 	tile* gameArea[GAME_AREA_HEIGHT][GAME_AREA_WIDTH];	// the game area is 20 tiles high and 10 tiles wide
-	board(QGraphicsScene* scene, QGraphicsView* view);
+	board(QGraphicsScene* scene);
 
 	void changeTile(int i, int j, int color);
 	bool isTileTaken(int i, int j);

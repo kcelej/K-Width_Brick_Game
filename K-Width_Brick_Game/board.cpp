@@ -2,7 +2,7 @@
 #include "board.h"
 
 
-board::board(QGraphicsScene* scene, QGraphicsView* view) {
+board::board(QGraphicsScene* scene) {
 	int boardX = 28;
 	int boardY = 30;
 	for (int i = 0; i < GAME_AREA_HEIGHT; i++) {
@@ -93,7 +93,6 @@ void board::delete_line(int i) {
 void board::move_all_down(int i) {
 	qDebug() << "Moving the lines.";
 	for (int row = i; row >= 0; row--) {
-		// If the row above does not exist (topmost row) or the row above is fully empty, delete the current row.
 		if (row - 1 < 0 || check_line_condition(row - 1, false)) {
 			delete_line(row);
 			break;
@@ -104,6 +103,7 @@ void board::move_all_down(int i) {
 					changeTileStatus(row, j, true);
 					changeTile(row, j, gameArea[row - 1][j]->get_color());
 				}
+				else resetTile(row,j);
 			}
 		}
 	}

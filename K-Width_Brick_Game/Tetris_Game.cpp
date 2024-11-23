@@ -16,7 +16,7 @@ Tetris_Game::Tetris_Game() {
     backgroundImageItem->setFlag(QGraphicsItem::ItemIsFocusable, false);  // background hopefully shouldn't take focus
 
     gameScene->addItem(backgroundImageItem);
-    gameBoard = new board(gameScene, gameView);
+    gameBoard = new board(gameScene);
 
     gameView->show();
     gameView->setFixedSize(gameWindowWidth, gameWindowHeight);
