@@ -192,19 +192,19 @@ private:
 	* Rotates the coordinates 90 degrees clockwise.
 	* @param Old_coordinates Array of old coordinates before rotation.
 	*/
-	void rotate90Degrees(point* Old_coordinates);
+	bool rotate90Degrees(point* Old_coordinates);
 
 	/*
 	* Rotates the coordinates 180 degrees.
 	* @param Old_coordinates Array of old coordinates before rotation.
 	*/
-	void rotate180Degrees(point* Old_coordinates);
+	bool rotate180Degrees(point* Old_coordinates);
 
 	/*
 	* Rotates the coordinates 270 degrees counter-clockwise (or 90 degrees clockwise).
 	* @param Old_coordinates Array of old coordinates before rotation.
 	*/
-	void rotate270Degrees(point* Old_coordinates);
+	bool rotate270Degrees(point* Old_coordinates);
 
 	/*
 	 * Checks for collision based on the temporary coordinates of the brick after rotation.

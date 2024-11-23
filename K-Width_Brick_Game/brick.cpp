@@ -348,13 +348,13 @@ bool brick::rotate() {
 		rotateDefault(Tmp_coordinates);
 		break;
 	case 1:
-		rotate90Degrees(Tmp_coordinates);
+		if (!rotate90Degrees(Tmp_coordinates)) return false;
 		break;
 	case 2:
-		rotate180Degrees(Tmp_coordinates);
+		if(!rotate180Degrees(Tmp_coordinates)) return false;
 		break;
 	case 3:
-		rotate270Degrees(Tmp_coordinates);
+		if(!rotate270Degrees(Tmp_coordinates)) return false;
 		break;
 	default:
 		qDebug() << "Invalid rotation.";
@@ -405,46 +405,55 @@ void brick::rotateDefault(point* Temp_coordinates) {
     }
 }
 
-void brick::rotate90Degrees(point* Temp_coordinates) {
+bool brick::rotate90Degrees(point* Temp_coordinates) {
 	for (int i = 6; i <= 7; ++i) {
 		int k = i;
 		int y = coordinates[(i % 2) ? 7 : 4].i;
 		int x = coordinates[6].j;
 
 		while (k >= i - 6) {
+			if (x >= GAME_AREA_WIDTH) return false; //can't rotate
 			Temp_coordinates[k].i = y;
 			Temp_coordinates[k].j = x++;
 			k -= 2;
 		}
 	}
+	//rotation succesfull
+	return true;
 }
 
-void brick::rotate180Degrees(point* Temp_coordinates) {
+bool brick::rotate180Degrees(point* Temp_coordinates) {
 	for (int i = 6; i <= 7; ++i) {
 		int k = i;
 		int y = coordinates[6].i;
 		int x = coordinates[(i % 2) ? 6 : 4].j;
 
 		while (k >= i - 6) {
+			if (y >= GAME_AREA_HEIGHT) return false; //can't rotate
 			Temp_coordinates[k].i = y++;
 			Temp_coordinates[k].j = x;
 			k -= 2;
 		}
 	}
+	//rotation succesfull
+	return true;
 }
 
-void brick::rotate270Degrees(point* Old_coordinates) {
+bool brick::rotate270Degrees(point* Old_coordinates) {
 	for (int i = 6; i <= 7; ++i) {
 		int k = i;
 		int y = coordinates[(i % 2) ? 6 : 4].i;
 		int x = coordinates[6].j;
 
 		while (k >= i - 6) {
+			if (x < 0) return false;
 			Old_coordinates[k].i = y;
 			Old_coordinates[k].j = x--;
 			k -= 2;
 		}
 	}
+	//rotation succesfull
+	return true;
 }
 
 //NEW VERSION BUT LAME
