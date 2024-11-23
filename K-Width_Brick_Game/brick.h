@@ -1,10 +1,7 @@
 #pragma once
 #include "board.h"
 
-class brick : public QWidget{
-
-	Q_OBJECT
-
+class brick{
 public:
 	/*
 	a brick is essentially a 2x4 sprite with tiles being printed wherever the boolean value is equal to 1 and a set of coordinates for each tile for movement tracking
@@ -191,18 +188,21 @@ private:
 	/*
 	* Rotates the coordinates 90 degrees clockwise.
 	* @param Old_coordinates Array of old coordinates before rotation.
+	* @return Return true if rotation is done, false otherwise.
 	*/
 	bool rotate90Degrees(point* Old_coordinates);
 
 	/*
 	* Rotates the coordinates 180 degrees.
 	* @param Old_coordinates Array of old coordinates before rotation.
+	* @return Return true if rotation is done, false otherwise.
 	*/
 	bool rotate180Degrees(point* Old_coordinates);
 
 	/*
 	* Rotates the coordinates 270 degrees counter-clockwise (or 90 degrees clockwise).
 	* @param Old_coordinates Array of old coordinates before rotation.
+	* @return Return true if rotation is done, false otherwise.
 	*/
 	bool rotate270Degrees(point* Old_coordinates);
 

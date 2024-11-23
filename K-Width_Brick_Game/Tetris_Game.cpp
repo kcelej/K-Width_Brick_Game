@@ -1,10 +1,12 @@
 #pragma once
 #include "Tetris_Game.h"
 #include "other_functions.h"
+#include "Tetris_Game_View.h"
 
 Tetris_Game::Tetris_Game() {
     gameScene = new QGraphicsScene();
-    gameView = new QGraphicsView(gameScene);
+    gameView = new Tetris_Game_View();
+    gameView->setScene(gameScene);
     gameView->setWindowTitle("Brick Game");
 
     QPixmap backgroundImagePixmap(":/resources/textures/background.png");
@@ -20,6 +22,8 @@ Tetris_Game::Tetris_Game() {
     gameView->setFixedSize(gameWindowWidth, gameWindowHeight);
     gameView->setHorizontalScrollBarPolicy(Qt::ScrollBarAlwaysOff);
     gameView->setVerticalScrollBarPolicy(Qt::ScrollBarAlwaysOff);
+
+    connect(static_cast<Tetris_Game_View*>(gameView), &Tetris_Game_View::move, this, &Tetris_Game::move);
 
     add_new_brick();
 
@@ -156,9 +160,6 @@ void Tetris_Game::add_new_brick() {
         player = new brick(random(0, 7), random(0, 6), gameBoard);
         //for tests only
         //player = new brick(random(0, 7), 0, gameBoard);
-
-        // Uncomment the following line and fix the issue to connect the keyboard input to the brick's handler.
-        // QObject::connect(this, &Tetris_Game::keyPressd, player, &brick::onKeyPress);
 
         qDebug() << "Added new brick"; // Log the creation of a new brick.
     }

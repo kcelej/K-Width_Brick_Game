@@ -94,6 +94,7 @@
   <ItemGroup>
     <ClCompile Include="brick.cpp" />
     <ClCompile Include="Tetris_Game.cpp" />
+    <ClCompile Include="Tetris_Game_View.cpp" />
     <ClCompile Include="tile.cpp" />
     <QtRcc Include="main_window.qrc" />
     <QtRcc Include="textures.qrc" />
@@ -107,10 +108,11 @@
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="board.h" />
-    <QtMoc Include="brick.h" />
+    <ClInclude Include="brick.h" />
     <ClInclude Include="Defines.h" />
     <ClInclude Include="other_functions.h" />
     <QtMoc Include="Tetris_Game.h" />
+    <QtMoc Include="Tetris_Game_View.h" />
     <ClInclude Include="tile.h" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />

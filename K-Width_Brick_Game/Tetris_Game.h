@@ -60,4 +60,6 @@ private:
     void moveRight();
     void moveDown();
     void rotateBrick();
+
+    void move(QKeyEvent* event) { player->movement(event); }
 };
