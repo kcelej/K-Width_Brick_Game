@@ -22,6 +22,41 @@ Tetris_Game::Tetris_Game() {
     gameView->setVerticalScrollBarPolicy(Qt::ScrollBarAlwaysOff);
 
     add_new_brick();
+
+    // Create Buttons
+    QPushButton* leftButton = new QPushButton("L");
+    leftButton->setGeometry(20, 20, 20, 20);  // Set position and size
+    connect(leftButton, &QPushButton::clicked, this, &Tetris_Game::moveLeft);
+
+    QPushButton* rightButton = new QPushButton("R");
+    rightButton->setGeometry(120, 20, 20, 20); // Set position and size
+    connect(rightButton, &QPushButton::clicked, this, &Tetris_Game::moveRight);
+
+    QPushButton* downButton = new QPushButton("D");
+    downButton->setGeometry(220, 20, 20, 20); // Set position and size
+    connect(downButton, &QPushButton::clicked, this, &Tetris_Game::moveDown);
+
+    QPushButton* rotateButton = new QPushButton("S");
+    rotateButton->setGeometry(320, 20, 20, 20); // Set position and size
+    connect(rotateButton, &QPushButton::clicked, this, &Tetris_Game::rotateBrick);
+
+    // Create buttons and add to scene as proxy widgets
+    QGraphicsProxyWidget* leftButtonProxy = gameScene->addWidget(leftButton);
+    QGraphicsProxyWidget* rightButtonProxy = gameScene->addWidget(rightButton);
+    QGraphicsProxyWidget* downButtonProxy = gameScene->addWidget(downButton);
+    QGraphicsProxyWidget* rotateButtonProxy = gameScene->addWidget(rotateButton);
+
+    // Set positions of the buttons
+    leftButtonProxy->setPos(20, 420);
+    rightButtonProxy->setPos(40, 420);
+    downButtonProxy->setPos(60, 420);
+    rotateButtonProxy->setPos(80, 420);
+    // Ensure buttons are on top of the background (set higher Z-value)
+    leftButtonProxy->setZValue(1);
+    rightButtonProxy->setZValue(1);
+    downButtonProxy->setZValue(1);
+    rotateButtonProxy->setZValue(1);
+
 };
 
 Tetris_Game::~Tetris_Game() {
@@ -70,43 +105,7 @@ void Tetris_Game::Game() {
                 break; // Exit the inner loop to spawn a new block.
             }
 
-           //make a line for line deletion test
-            if (how_many == 1 && temp == 1) {
-                temp++;
-                player->movement(2);
-                player->movement(1);
-                player->movement(1);
-                player->movement(1);
-                player->movement(1);
-            }
-            if (how_many == 3 && temp == 2) {
-                temp++;
-                player->movement(0);
-            }
-            if (how_many == 4 && temp == 3) {
-                temp++;
-                player->movement(2);
-                player->movement(0);
-                player->movement(0);
-                player->movement(0);
-                player->movement(0);
-            }
-            if (how_many == 5 && temp == 4) {
-                temp++;
-                player->movement(2);
-                player->movement(1);
-                player->movement(1);
-                player->movement(1);
-                player->movement(1);
-            }
-            if (how_many == 6 && temp == 5) {
-                temp++;
-                player->movement(2);
-                player->movement(0);
-                player->movement(0);
-                player->movement(0);
-                player->movement(0);
-            }
+           
 
             if (frameCounter++ >= 60) {
                 // If 60 frames have elapsed (approximately 1 second at 60 FPS):
@@ -183,3 +182,26 @@ void Tetris_Game::place_brick(bool& game_ended) {
 
 
 
+void Tetris_Game::moveLeft() {
+    if (player) {
+        player->movement(1);  // Move brick left
+    }
+}
+
+void Tetris_Game::moveRight() {
+    if (player) {
+        player->movement(0);  // Move brick right
+    }
+}
+
+void Tetris_Game::moveDown() {
+    if (player) {
+        player->movement(3);  // Move brick down
+    }
+}
+
+void Tetris_Game::rotateBrick() {
+    if (player) {
+        player->movement(2);  // Rotate brick
+    }
+}

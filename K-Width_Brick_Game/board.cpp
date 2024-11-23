@@ -16,6 +16,7 @@ board::board(QGraphicsScene* scene, QGraphicsView* view) {
 		boardX = 28;
 		boardY += TILE_SIZE;
 	}
+
 }
 
 

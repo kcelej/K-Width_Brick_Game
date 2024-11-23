@@ -55,4 +55,9 @@ private:
      *                   This is set to true if the brick is positioned above the board's top boundary.
      */
     void place_brick(bool& game_ended);
+
+    void moveLeft();
+    void moveRight();
+    void moveDown();
+    void rotateBrick();
 };
