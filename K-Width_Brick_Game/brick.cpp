@@ -38,24 +38,24 @@ void brick::reset_entire_brick() const{
 
 void brick::movement(QKeyEvent* event) {
 	switch (event->key()) {
-	case Qt::Key_Up:
-		qDebug() << "Up arrow pressed";
+	case Qt::Key_Up: case Qt::Key_W:
+		qDebug() << "Rotate";
 		change_rotation();
 		break;
 
-	case Qt::Key_Down:
-		qDebug() << "Down arrow pressed";
+	case Qt::Key_Down: case Qt::Key_S:
+		qDebug() << "Move down";
 		reset_entire_brick();
 		can_be_still_moved = move_down();
 		break;
 
-	case Qt::Key_Left:
-		qDebug() << "Left arrow pressed";
+	case Qt::Key_Left: case Qt::Key_A:
+		qDebug() << "Move left";
 		move_left();
 		break;
 
-	case Qt::Key_Right:
-		qDebug() << "Right arrow pressed";
+	case Qt::Key_Right: case Qt::Key_D:
+		qDebug() << "Move right";
 		move_right();
 		break;
 
