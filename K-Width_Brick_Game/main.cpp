@@ -1,5 +1,7 @@
 #include "main_window.h"
 #include <QtWidgets/QApplication>
+#include "NetworkGame.h"
+
 
 
 int main(int argc, char *argv[])

@@ -1,6 +1,7 @@
 #pragma once
 #include <QtWidgets/QMainWindow>
 #include "ui_main_window.h"
+#include "NetworkGame.h"
 
 
 class main_window : public QMainWindow
@@ -13,6 +14,12 @@ public:
 
 private:
     Ui::main_windowClass ui;
+
+    //do testow, pozniej usunac
+    NetworkGame g1;
+    NetworkGame g2;
+    NetworkGame g3;
+    NetworkGame g4;
 
 private slots:
     void on_testGameButton_clicked();

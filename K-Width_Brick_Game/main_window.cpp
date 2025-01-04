@@ -15,6 +15,34 @@ main_window::main_window(QWidget *parent)
     : QMainWindow(parent)
 {
     ui.setupUi(this);
+
+    //do testow. pozniej usunac
+    g1.setUserId(1);
+    g2.setUserId(2);
+    g3.setUserId(3);
+    g4.setUserId(4);
+
+    g1.configNetworkNeighbors(NetworkUtils::getLocalHost(), 15551, 15550);
+    g2.configNetworkNeighbors(NetworkUtils::getLocalHost(), 15552, 15551);
+    g3.configNetworkNeighbors(NetworkUtils::getLocalHost(), 15553, 15552);
+    g4.configNetworkNeighbors(NetworkUtils::getLocalHost(), 15550, 15553);
+
+    g1.startListening();
+    g2.startListening();
+    g3.startListening();
+    g4.startListening();
+    QThread::msleep(1000);
+    g1.connectToNext();
+    g2.connectToNext();
+    g3.connectToNext();
+    g4.connectToNext();
+
+    g1.startGame();
+    g2.startGame();
+    g3.startGame();
+    g4.startGame();
+
+    QThread::msleep(1000);
 }
 
 main_window::~main_window()

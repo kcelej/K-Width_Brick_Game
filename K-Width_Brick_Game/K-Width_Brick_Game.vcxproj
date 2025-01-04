@@ -36,9 +36,9 @@
     <Import Project="$(QtMsBuild)\qt_defaults.props" />
   </ImportGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)' == 'Debug|x64'" Label="QtSettings">
-    <QtInstall>6.8.0_msvc2022_64</QtInstall>
-    <QtModules>core;gui;widgets</QtModules>
+    <QtModules>core;gui;network;widgets</QtModules>
     <QtBuildConfig>debug</QtBuildConfig>
+    <QtInstall>6.8.1_msvc2022_64</QtInstall>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)' == 'Release|x64'" Label="QtSettings">
     <QtInstall>6.8.0_msvc2022_64</QtInstall>
@@ -63,6 +63,18 @@
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)' == 'Release|x64'">
   </PropertyGroup>
+  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
+    <ClCompile>
+      <AdditionalIncludeDirectories>
+      </AdditionalIncludeDirectories>
+      <PreprocessorDefinitions>QT_NETWORK_LIB;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+    </ClCompile>
+    <Link>
+      <AdditionalLibraryDirectories>
+      </AdditionalLibraryDirectories>
+      <AdditionalDependencies>$(CoreLibraryDependencies);%(AdditionalDependencies)</AdditionalDependencies>
+    </Link>
+  </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)' == 'Debug|x64'" Label="Configuration">
     <ClCompile>
       <MultiProcessorCompilation>true</MultiProcessorCompilation>
@@ -71,7 +83,7 @@
       <ConformanceMode>true</ConformanceMode>
     </ClCompile>
     <Link>
-      <SubSystem>Windows</SubSystem>
+      <SubSystem>Console</SubSystem>
       <GenerateDebugInformation>true</GenerateDebugInformation>
     </Link>
   </ItemDefinitionGroup>
@@ -93,6 +105,12 @@
   </ItemDefinitionGroup>
   <ItemGroup>
     <ClCompile Include="brick.cpp" />
+    <ClCompile Include="NetworkGame.cpp" />
+    <ClCompile Include="NetworkMessage.cpp" />
+    <ClCompile Include="NetworkMessageFactory.cpp" />
+    <ClCompile Include="NetworkMessageManager.cpp" />
+    <ClCompile Include="NetworkUtils.cpp" />
+    <ClCompile Include="Player.cpp" />
     <ClCompile Include="Tetris_Game.cpp" />
     <ClCompile Include="Tetris_Game_View.cpp" />
     <ClCompile Include="tile.cpp" />
@@ -110,9 +128,15 @@
     <ClInclude Include="board.h" />
     <ClInclude Include="brick.h" />
     <ClInclude Include="Defines.h" />
+    <ClInclude Include="NetworkGame.h" />
+    <ClInclude Include="NetworkMessage.h" />
+    <QtMoc Include="NetworkMessageManager.h" />
+    <ClInclude Include="NetworkMessageFactory.h" />
+    <ClInclude Include="NetworkUtils.h" />
     <ClInclude Include="other_functions.h" />
     <QtMoc Include="Tetris_Game.h" />
     <QtMoc Include="Tetris_Game_View.h" />
+    <ClInclude Include="Player.h" />
     <ClInclude Include="tile.h" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
