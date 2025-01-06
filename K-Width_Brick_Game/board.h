@@ -1,7 +1,7 @@
 #pragma once
 #include <QtWidgets>
 #include "tile.h"
-
+#include "NetworkMessageManager.h"
 // GAME WINDOW DATA:
 const int gameWindowHeight = 480;	// height of the game window (in pixels)
 const int gameWindowWidth = 320;	// width of the game window (in pixels)
@@ -9,6 +9,9 @@ const int gameWindowWidth = 320;	// width of the game window (in pixels)
 
 class board
 {
+private:
+	NetworkMessageManager* networkMessageManager = nullptr;
+	void notifyOtherNetworkPlayers(NetworkMessage message);
 public:
 	tile* gameArea[GAME_AREA_HEIGHT][GAME_AREA_WIDTH];	// the game area is 20 tiles high and 10 tiles wide
 	board(QGraphicsScene* scene);
@@ -52,6 +55,8 @@ public:
 	 * If a line is fully occupied, it is deleted, and all lines above it are shifted down.
 	 */
 	void check_board();
+
+	void setNetworkMessageManager(NetworkMessageManager* networkMessageManagerVal);
 
 	friend class tile;
 };

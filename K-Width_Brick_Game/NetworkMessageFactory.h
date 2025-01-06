@@ -5,8 +5,8 @@
 
 class NetworkMessageFactory {
 public:
-    static NetworkMessage createRowDeletedMessage(const Player& sender);
-    static NetworkMessage createCanRowBeDeletedMessage(const Player& sender);
+    static NetworkMessage createDeleteRowMessage(const Player& sender, int rowNumber);
+    static NetworkMessage createCanRowBeDeletedMessage(const Player& sender, int rowNumber);
 };
 
 #endif // NETWORKMESSAGEFACTORY_H

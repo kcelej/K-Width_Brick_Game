@@ -128,7 +128,7 @@
     <ClInclude Include="board.h" />
     <ClInclude Include="brick.h" />
     <ClInclude Include="Defines.h" />
-    <ClInclude Include="NetworkGame.h" />
+    <QtMoc Include="NetworkGame.h" />
     <ClInclude Include="NetworkMessage.h" />
     <QtMoc Include="NetworkMessageManager.h" />
     <ClInclude Include="NetworkMessageFactory.h" />

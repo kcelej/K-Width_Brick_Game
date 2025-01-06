@@ -1,6 +1,6 @@
 #pragma once
 #include "board.h"
-
+#include "NetworkMessageFactory.h"
 
 board::board(QGraphicsScene* scene) {
 	int boardX = 28;
@@ -117,8 +117,19 @@ void board::check_board() {
 		while (check_line_condition(i, true)) {
 			// The line is full and can be removed.
 			delete_line(i);
+			notifyOtherNetworkPlayers(NetworkMessageFactory::createDeleteRowMessage(networkMessageManager->getLocalPlayer(), i));
 			// Shift all lines above the deleted line one row down.
 			move_all_down(i);
 		}
 	}
+}
+
+void board::setNetworkMessageManager(NetworkMessageManager* networkMessageManagerVal) {
+	networkMessageManager = networkMessageManagerVal;
+}
+
+void board::notifyOtherNetworkPlayers(NetworkMessage message) {
+	if (networkMessageManager) {
+		networkMessageManager->sendMessageToNext(message);
+	}//todo cos za duzo wiadomosci o usunieciu wysyla i nie obniza w dol klockow
 }

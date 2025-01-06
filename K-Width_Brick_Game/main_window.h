@@ -2,7 +2,7 @@
 #include <QtWidgets/QMainWindow>
 #include "ui_main_window.h"
 #include "NetworkGame.h"
-
+#include "QThread"
 
 class main_window : public QMainWindow
 {
@@ -16,11 +16,9 @@ private:
     Ui::main_windowClass ui;
 
     //do testow, pozniej usunac
-    NetworkGame g1;
-    NetworkGame g2;
-    NetworkGame g3;
-    NetworkGame g4;
-
+    NetworkGame game;
+    void symulateServerConfiguration();//symuluje +/- to co ma wykonac uzytkownik serwer przed rozpoczeciem gry
+    // koniec zmian do usuniecia
 private slots:
     void on_testGameButton_clicked();
 };

@@ -10,39 +10,17 @@
 #include "brick.h"
 #include "board.h"
 //
+#include <QThread>
+#include <QCoreApplication>
+#include "NetworkGame.h"
+#include "NetworkUtils.h"
+#include "iostream"
 
 main_window::main_window(QWidget *parent)
     : QMainWindow(parent)
 {
     ui.setupUi(this);
-
-    //do testow. pozniej usunac
-    g1.setUserId(1);
-    g2.setUserId(2);
-    g3.setUserId(3);
-    g4.setUserId(4);
-
-    g1.configNetworkNeighbors(NetworkUtils::getLocalHost(), 15551, 15550);
-    g2.configNetworkNeighbors(NetworkUtils::getLocalHost(), 15552, 15551);
-    g3.configNetworkNeighbors(NetworkUtils::getLocalHost(), 15553, 15552);
-    g4.configNetworkNeighbors(NetworkUtils::getLocalHost(), 15550, 15553);
-
-    g1.startListening();
-    g2.startListening();
-    g3.startListening();
-    g4.startListening();
-    QThread::msleep(1000);
-    g1.connectToNext();
-    g2.connectToNext();
-    g3.connectToNext();
-    g4.connectToNext();
-
-    g1.startGame();
-    g2.startGame();
-    g3.startGame();
-    g4.startGame();
-
-    QThread::msleep(1000);
+    symulateServerConfiguration();
 }
 
 main_window::~main_window()
@@ -138,4 +116,32 @@ void main_window::on_testGameButton_clicked() {
 
    //idk
    return;
+}
+
+void main_window::symulateServerConfiguration() {
+    //do testow. symuluje to co ma skonfigurowac gracz serwer
+    std::cout << "Uwaga brak walidacji!\n";
+
+    int listeningPort = 0;
+    std::cout << "Podaj port do sluchania:\t";
+    std::cin >> listeningPort;
+
+    int sendingPort = 0;
+    std::cout << "Podaj port do wysylania:\t";
+    std::cin >> sendingPort;
+
+    int userId = 0;
+    std::cout << "Podaj user id:\t";
+    std::cin >> userId;
+
+    std::cout << "Zatwierdz(dowolny klawisz):\t";
+    std::cin.get();
+    std::cin.get();
+
+    game.setUserId(userId);
+    game.configNetworkNeighbors(NetworkUtils::getLocalHost(), sendingPort, listeningPort);
+    game.startListening();
+    QThread::msleep(5000);
+    game.connectToNext();
+    game.startGame();
 }
