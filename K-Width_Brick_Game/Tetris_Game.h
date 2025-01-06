@@ -6,6 +6,7 @@
 
 #include "board.h"
 #include "brick.h"
+#include "NetworkMessageManager.h"
 
 
 class Tetris_Game : public QWidget {
@@ -16,6 +17,7 @@ public:
     Tetris_Game();  // Constructor for the Tetris_Game class
     ~Tetris_Game(); // Destructor for cleaning up resources
     void Game();    // Main game loop
+    board* getBoard();
 
 private:
     QGraphicsScene* gameScene = nullptr;              // Pointer to the game scene for rendering

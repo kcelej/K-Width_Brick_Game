@@ -206,3 +206,7 @@ void Tetris_Game::rotateBrick() {
         player->movement(2);  // Rotate brick
     }
 }
+
+board* Tetris_Game::getBoard() {
+    return gameBoard;
+}
