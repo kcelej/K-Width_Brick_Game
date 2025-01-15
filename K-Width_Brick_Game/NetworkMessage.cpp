@@ -49,3 +49,44 @@ NetworkMessage NetworkMessage::fromByteArray(const QByteArray& data) {
     Player sender(senderIp, senderId);
     return NetworkMessage(sender, messageText, messageSendTime, messageType);
 }
+
+NetworkMessage::CanRowBeDeletedMessageInfo::CanRowBeDeletedMessageInfo(int numberOfPlayersVal, int numberOfRowVal): playersRowState(numberOfPlayersVal,false) {
+    numberOfPlayers = numberOfPlayersVal;
+    numberOfRow = numberOfRowVal;
+}
+
+NetworkMessage::CanRowBeDeletedMessageInfo NetworkMessage::CanRowBeDeletedMessageInfo::fromString(QString str) {
+    QStringList strList = str.split(',');
+    int numberOfPlayers = strList.at(0).toInt();
+    int numberOfRow = strList.at(1).toInt();
+    std::vector<bool> playersRowState(numberOfPlayers,false);
+    for (int i = 0; i < numberOfPlayers; ++i) {
+        playersRowState[i] = (strList.at(i + 2) == "0") ? false : true;
+    }
+    CanRowBeDeletedMessageInfo messageInfo(numberOfPlayers, numberOfRow);
+    messageInfo.playersRowState = playersRowState;
+    return messageInfo;
+}
+QString NetworkMessage::CanRowBeDeletedMessageInfo::toString() {
+    QString str = QString("%1,%2").arg(numberOfPlayers).arg(numberOfRow);
+    for (int i = 0; i < numberOfPlayers; ++i) {
+        if (playersRowState[i] == true) {
+            str.append(",1");
+        }
+        else {
+            str.append(",0");
+        }
+    }
+    return str;
+}
+
+NetworkMessage::CanRowBeDeletedMessageInfo& NetworkMessage::CanRowBeDeletedMessageInfo::operator=(const CanRowBeDeletedMessageInfo& rv) {
+    numberOfPlayers = rv.numberOfPlayers;
+    numberOfRow = rv.numberOfRow;
+    playersRowState = rv.playersRowState;
+    return *this;
+}
+//text nie jest porownwywane
+bool NetworkMessage::operator==(const NetworkMessage& rv) const {
+    return sender.getId() == rv.sender.getId() && sendTime == rv.sendTime && typeOfMessage == rv.typeOfMessage;
+}

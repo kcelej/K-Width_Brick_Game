@@ -19,7 +19,11 @@ public:
     void Game();    // Main game loop
     board* getBoard();
 
+    void freeze();
+    void unFreeze();
+
 private:
+    bool gameFreezed;
     QGraphicsScene* gameScene = nullptr;              // Pointer to the game scene for rendering
     QGraphicsView* gameView = nullptr;                // Pointer to the view used to display the game scene
     QGraphicsPixmapItem* backgroundImageItem = nullptr; // Pointer to the background image item

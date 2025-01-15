@@ -2,6 +2,7 @@
 #include <QtWidgets>
 #include "tile.h"
 #include "NetworkMessageManager.h"
+#include <mutex>
 // GAME WINDOW DATA:
 const int gameWindowHeight = 480;	// height of the game window (in pixels)
 const int gameWindowWidth = 320;	// width of the game window (in pixels)
@@ -12,6 +13,9 @@ class board
 private:
 	NetworkMessageManager* networkMessageManager = nullptr;
 	void notifyOtherNetworkPlayers(NetworkMessage message);
+	bool linesStatus[GAME_AREA_HEIGHT];
+	void setLineStatus(int lineNumber, bool checked);
+	std::mutex boardMutex;
 public:
 	tile* gameArea[GAME_AREA_HEIGHT][GAME_AREA_WIDTH];	// the game area is 20 tiles high and 10 tiles wide
 	board(QGraphicsScene* scene);

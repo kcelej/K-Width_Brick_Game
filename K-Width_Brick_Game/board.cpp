@@ -67,15 +67,15 @@ void board::resetTile(int i, int j) {
 }
 
 bool board::check_line_condition(int i, bool check_for_occupied) {
-	qDebug() << "Checking the line with condition:" << (check_for_occupied ? "Occupied" : "Empty");
+	//qDebug() << "Checking the line with condition:" << (check_for_occupied ? "Occupied" : "Empty");
 	for (int j = 0; j < GAME_AREA_WIDTH; j++) {
 		bool is_occupied = gameArea[i][j]->getIsOccupied();
 		if (check_for_occupied && !is_occupied) {
-			qDebug() << "The line contains blanks.";
+			//qDebug() << "The line contains blanks.";
 			return false; // The line is not fully occupied.
 		}
 		if (!check_for_occupied && is_occupied) {
-			qDebug() << "The line contains bricks.";
+			//qDebug() << "The line contains bricks.";
 			return false; // The line is not fully empty.
 		}
 	}
@@ -84,44 +84,134 @@ bool board::check_line_condition(int i, bool check_for_occupied) {
 }
 
 void board::delete_line(int i) {
-	qDebug() << "Line removal.";
+	qDebug() << "Line " << i << " removed.";
 	for (int j = 0; j < GAME_AREA_WIDTH; j++) {
 		resetTile(i, j);
 	}
+	//setLineStatus(i, false);
 }
 
 void board::move_all_down(int i) {
-	qDebug() << "Moving the lines.";
-	for (int row = i; row >= 0; row--) {
-		if (row - 1 < 0 || check_line_condition(row - 1, false)) {
-			delete_line(row);
-			break;
-		}
-		else {
+	//qDebug() << "Moving the lines. i:"<<i;
+	//try
+	//{
+	//	for (int row = i; row >= 0; row--) {
+	//		if (row - 1 < 0 || check_line_condition(row - 1, false)) {
+	//			delete_line(row);
+	//			break;
+	//		}
+	//		else {
+	//			for (int j = 0; j < GAME_AREA_WIDTH; j++) {
+	//				if (gameArea[row - 1][j]->getIsOccupied()) {
+	//					changeTileStatus(row, j, true);
+	//					changeTile(row, j, gameArea[row - 1][j]->get_color());
+	//				}
+	//				else resetTile(row, j);
+	//			}
+	//		}
+	//	}
+	//}
+	//catch (const std::exception& e)
+	//{
+	//	qDebug() << e.what();
+	//}
+
+	qDebug() << "Moving all lines down from row:" << i;
+
+	try {
+		// Zabezpieczenie dostêpu do planszy w razie potrzeby (mutex)
+		std::lock_guard<std::mutex> lock(boardMutex);
+
+		// Zaczynamy przesuwaæ kafelki z wiersza i do wiersza poni¿ej
+		for (int row = i; row > 0; row--) {
 			for (int j = 0; j < GAME_AREA_WIDTH; j++) {
+				// Jeœli kafelek w wierszu powy¿ej jest zajêty
 				if (gameArea[row - 1][j]->getIsOccupied()) {
-					changeTileStatus(row, j, true);
-					changeTile(row, j, gameArea[row - 1][j]->get_color());
+					// Przesuwamy kafelek w dó³
+					changeTileStatus(row, j, true);  // Zmieniamy status na zajêty
+					changeTile(row, j, gameArea[row - 1][j]->get_color());  // Przesuwamy kolor kafelka
 				}
-				else resetTile(row,j);
+				else {
+					resetTile(row, j);  // Jeœli nie ma kafelka, resetujemy go
+				}
 			}
 		}
 	}
+	catch (const std::exception& e) {
+		qDebug() << "Exception occurred while moving lines down: " << e.what();
+	}
+
 }
 
 void board::check_board() {
 	qDebug() << "Checking the board.";
 	// Start checking from the bottom-most row and move upward.
+	notifyOtherNetworkPlayers(NetworkMessageFactory::createListenOnlyMeMessage(networkMessageManager->getLocalPlayer()));
+	while (true) {
+		if (networkMessageManager->isEveryOneListenMe()) {
+			break;
+		}
+		if (networkMessageManager->isListenOlnyOtherPlayer()) {
+			return;
+		}
+		QCoreApplication::processEvents();
+	}
+	//if(potwierdzone){}
+	//else if slcuha kogos innego return
 	for (int i = GAME_AREA_HEIGHT - 1; i >= 0; i--) {
 		// Continue checking the same row while it is completely filled.
-		while (check_line_condition(i, true)) {
-			// The line is full and can be removed.
-			delete_line(i);
-			notifyOtherNetworkPlayers(NetworkMessageFactory::createDeleteRowMessage(networkMessageManager->getLocalPlayer(), i));
-			// Shift all lines above the deleted line one row down.
-			move_all_down(i);
+		//while (check_line_condition(i, true)) {
+		//	// The line is full and can be removed.
+		//	delete_line(i);
+		//	notifyOtherNetworkPlayers(NetworkMessageFactory::createDeleteRowMessage(networkMessageManager->getLocalPlayer(), i));
+		//	// Shift all lines above the deleted line one row down.
+		//	move_all_down(i);
+		//}
+		//jesli gracz lokalnie stwierdzi, ze moze usunac wiersz, to wysyla wiadomosc do inncyh z zapytaniem, czy inni tez moga
+	/*	if (check_line_condition(i, true)) {
+			if (linesStatus[i] == false) {
+			notifyOtherNetworkPlayers(NetworkMessageFactory::createCanRowBeDeletedMessage(networkMessageManager->getLocalPlayer(), i, true));
+				setLineStatus(i, true);
+			}
+		}*/
+		/*if (check_line_condition(i, true)) {
+
+			NetworkMessage message = NetworkMessageFactory::createCanRowBeDeletedMessage(networkMessageManager->getLocalPlayer(), i, true);
+			notifyOtherNetworkPlayers(message);
+			networkMessageManager->waitForMessageFinish(message);
+		}*/
+
+		qDebug() << "Entering row check for row:" << i;
+
+		if (check_line_condition(i, true)) {
+			qDebug() << "Condition met for row:" << i;
+
+			try {
+				NetworkMessage message = NetworkMessageFactory::createCanRowBeDeletedMessage(
+					networkMessageManager->getLocalPlayer(), i, true
+				);
+
+				qDebug() << "Message created for row:" << i;
+
+				notifyOtherNetworkPlayers(message);
+
+				qDebug() << "Waiting for message finish for row:" << i;
+
+				networkMessageManager->waitForMessageFinish(message);
+
+				qDebug() << "Finished processing row:" << i;
+			}
+			catch (const std::exception& e) {
+				qDebug() << "Exception for row:" << i << "Exception:" << e.what();
+			}
+		}
+		else {
+			qDebug() << "Condition not met for row:" << i;
 		}
 	}
+	NetworkMessage message = NetworkMessageFactory::createStopListenOnlyMeMessage(networkMessageManager->getLocalPlayer());
+	notifyOtherNetworkPlayers(message);
+	networkMessageManager->waitForMessage(message);
 }
 
 void board::setNetworkMessageManager(NetworkMessageManager* networkMessageManagerVal) {
@@ -129,7 +219,12 @@ void board::setNetworkMessageManager(NetworkMessageManager* networkMessageManage
 }
 
 void board::notifyOtherNetworkPlayers(NetworkMessage message) {
+	qDebug() << "board::notifyOtherNetworkPlayers";
 	if (networkMessageManager) {
 		networkMessageManager->sendMessageToNext(message);
-	}//todo cos za duzo wiadomosci o usunieciu wysyla i nie obniza w dol klockow
+	}
+}
+
+void board::setLineStatus(int lineNumber, bool checked) {
+	linesStatus[lineNumber] = checked;
 }

@@ -39,28 +39,28 @@ void brick::reset_entire_brick() const{
 void brick::movement(QKeyEvent* event) {
 	switch (event->key()) {
 	case Qt::Key_Up: case Qt::Key_W:
-		qDebug() << "Rotate";
+		//qDebug() << "Rotate";
 		change_rotation();
 		break;
 
 	case Qt::Key_Down: case Qt::Key_S:
-		qDebug() << "Move down";
+		//qDebug() << "Move down";
 		reset_entire_brick();
 		can_be_still_moved = move_down();
 		break;
 
 	case Qt::Key_Left: case Qt::Key_A:
-		qDebug() << "Move left";
+		//qDebug() << "Move left";
 		move_left();
 		break;
 
 	case Qt::Key_Right: case Qt::Key_D:
-		qDebug() << "Move right";
+		//qDebug() << "Move right";
 		move_right();
 		break;
 
 	default:
-		qDebug() << "Other key pressed";
+		//qDebug() << "Other key pressed";
 		break;
 	}
 
@@ -77,27 +77,27 @@ void brick::movement(int key) {
 	*/
 	switch (key) {
 	case 2:
-		qDebug() << "Up arrow pressed";
+		//qDebug() << "Up arrow pressed";
 		change_rotation();
 		break;
 
 	case 3:
-		qDebug() << "Down arrow pressed";
+		//qDebug() << "Down arrow pressed";
 		can_be_still_moved = move_down();
 		break;
 
 	case 1:
-		qDebug() << "Left arrow pressed";
+		//qDebug() << "Left arrow pressed";
 		move_left();
 		break;
 
 	case 0:
-		qDebug() << "Right arrow pressed";
+		//qDebug() << "Right arrow pressed";
 		move_right();
 		break;
 
 	default:
-		qDebug() << "Other key pressed";
+		//qDebug() << "Other key pressed";
 		break;
 	}
 
@@ -357,13 +357,13 @@ bool brick::rotate() {
 		rotate270Degrees(Tmp_coordinates);
 		break;
 	default:
-		qDebug() << "Invalid rotation.";
+		//qDebug() << "Invalid rotation.";
 		return false;
 	}
 
 	// Collision check for temporary coordinates
 	if (checkForCollision_Rotation(Tmp_coordinates)) {
-		qDebug() << "Rotation not possible due to collision.";
+		//qDebug() << "Rotation not possible due to collision.";
 		return false;
 	}
 
@@ -372,7 +372,7 @@ bool brick::rotate() {
 		coordinates[tile].copy_coordinates(Tmp_coordinates[tile]);
 	}
 
-	qDebug() << "Rotation possible and done.";
+	//qDebug() << "Rotation possible and done.";
 	return true;
 }
 
@@ -883,7 +883,7 @@ bool brick::checkForCollision_Movement_Brick(int index, int offset_i, int offset
 
 	// Check if the target position is occupied by another block
 	if (b->gameArea[target_i][target_j]->getIsOccupied()) {
-		qDebug() << "Collision with another block.";
+		//qDebug() << "Collision with another block.";
 		return true;
 	}
 
@@ -898,7 +898,7 @@ bool brick::checkForCollision_Movement_Border(int index, int offset_i, int offse
 
 	// Check if the target coordinates are outside the game area boundaries
 	if (target_i >= GAME_AREA_HEIGHT || target_j < 0 || target_j >= GAME_AREA_WIDTH) {
-		qDebug() << "Collision with border.";
+		//qDebug() << "Collision with border.";
 		return true;
 	}
 
@@ -945,7 +945,7 @@ bool brick::move_down() {
 		return true;
 	}
 	// Collision detected; stop moving the brick down
-	qDebug() << "Stop moving this block.";
+	//qDebug() << "Stop moving this block.";
 	return false;
 }
 
@@ -957,7 +957,7 @@ void brick::move_left() {
 		for (int tile = 0; tile < ALL_TILES; tile++) {
 			coordinates[tile].j--;
 		}
-		qDebug() << "Moved to the left.";
+		//qDebug() << "Moved to the left.";
 	}
 	// If collision is detected, the brick remains in its current position
 }
@@ -970,7 +970,7 @@ void brick::move_right() {
 		for (int tile = 0; tile < ALL_TILES; tile++) {
 			coordinates[tile].j++;
 		}
-		qDebug() << "Moved to the right.";
+		//qDebug() << "Moved to the right.";
 	}
 	// If collision is detected, the brick remains in its current position
 }

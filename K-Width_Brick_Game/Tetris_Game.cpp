@@ -4,6 +4,7 @@
 #include "Tetris_Game_View.h"
 
 Tetris_Game::Tetris_Game() {
+    gameFreezed = false;
     gameScene = new QGraphicsScene();
     gameView = new Tetris_Game_View();
     gameView->setScene(gameScene);
@@ -99,33 +100,38 @@ void Tetris_Game::Game() {
     while (!game_ended) {
         // Inner loop to control the active player block.
         while (player) {
+            if (!gameFreezed)
+            {
+                if (!player->can_be_still_moved) {
+                  //  qDebug("4");
+                    how_many++; // Increment the number of blocks processed.
 
-            if (!player->can_be_still_moved) {
+                    // If the current block can no longer be moved:
+                    place_brick(game_ended);
+                    break; // Exit the inner loop to spawn a new block.
+                }
 
-                how_many++; // Increment the number of blocks processed.
 
-                // If the current block can no longer be moved:
-                place_brick(game_ended);
-                break; // Exit the inner loop to spawn a new block.
+                if (frameCounter++ >= 60) {
+                   // qDebug("6");
+                    // If 60 frames have elapsed (approximately 1 second at 60 FPS):
+                    player->movement(3); // Move the block down by one step.
+                    frameCounter = 0; // Reset the frame counter.
+                }
+
+                player->draw(); // Redraw the current state of the block.
+                waitForNextFrame(timer, frameDelay); // Wait for the next frame to maintain FPS.
             }
-
-           
-
-            if (frameCounter++ >= 60) {
-                // If 60 frames have elapsed (approximately 1 second at 60 FPS):
-                player->movement(3); // Move the block down by one step.
-                frameCounter = 0; // Reset the frame counter.
-            }
-
-            player->draw(); // Redraw the current state of the block.
-            waitForNextFrame(timer, frameDelay); // Wait for the next frame to maintain FPS.
+            QCoreApplication::processEvents();
         }
-  
-        if (game_ended) break;
-        // After the inner loop, chceck board.
-        gameBoard->check_board();
-        // After the inner loop, spawn a new block.
-        add_new_brick();
+        if (!gameFreezed) {
+            if (game_ended) break;
+            // After the inner loop, chceck board.
+            gameBoard->check_board();
+            // After the inner loop, spawn a new block.
+            add_new_brick();
+        }
+        QCoreApplication::processEvents();
     }
     qDebug() << "Game ended";
 }
@@ -209,4 +215,17 @@ void Tetris_Game::rotateBrick() {
 
 board* Tetris_Game::getBoard() {
     return gameBoard;
+}
+
+void Tetris_Game::freeze() {
+    //std::mutex m;
+    //m.lock();
+    gameFreezed = true;
+    //m.unlock();
+}
+void Tetris_Game::unFreeze() {
+    //std::mutex m;
+    //m.lock();
+    gameFreezed = false;
+    //m.unlock();
 }

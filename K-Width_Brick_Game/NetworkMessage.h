@@ -13,10 +13,28 @@ class NetworkMessage {
 public:
     enum NetworkMessageType {
         deleteRow,
-        canRowBeDeleted
+        canRowBeDeleted,
+        moveAllDown,
+        listenOnlyMe,
+        stopListenOnlyMe
+    };
+
+    struct CanRowBeDeletedMessageInfo {
+    public:
+        CanRowBeDeletedMessageInfo(int numberOfPlayersVal, int numberOfRowVal);
+
+        static CanRowBeDeletedMessageInfo fromString(QString str);
+        QString toString();
+
+        CanRowBeDeletedMessageInfo& operator=(const CanRowBeDeletedMessageInfo & rv);
+
+        int numberOfPlayers;
+        std::vector<bool> playersRowState;
+        int numberOfRow;
     };
 
     NetworkMessage(const Player& sender, const QString& text, const QTime& sendTime, NetworkMessageType type);
+    NetworkMessage() = default;
 
     Player getSender() const;
     QString getText() const;
@@ -25,11 +43,14 @@ public:
     QByteArray toByteArray() const; // Serializacja
     static NetworkMessage fromByteArray(const QByteArray& data); // Deserializacja
 
+    bool operator==(const NetworkMessage& rv) const;
+
 private:
     Player sender;
     NetworkMessageType typeOfMessage;
     QString text;
     QTime sendTime;
 };
+
 
 #endif // NETWORKMESSAGE_H
