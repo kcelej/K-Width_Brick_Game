@@ -92,54 +92,52 @@ void board::delete_line(int i) {
 }
 
 void board::move_all_down(int i) {
-	//qDebug() << "Moving the lines. i:"<<i;
-	//try
-	//{
-	//	for (int row = i; row >= 0; row--) {
-	//		if (row - 1 < 0 || check_line_condition(row - 1, false)) {
-	//			delete_line(row);
-	//			break;
-	//		}
-	//		else {
-	//			for (int j = 0; j < GAME_AREA_WIDTH; j++) {
-	//				if (gameArea[row - 1][j]->getIsOccupied()) {
-	//					changeTileStatus(row, j, true);
-	//					changeTile(row, j, gameArea[row - 1][j]->get_color());
-	//				}
-	//				else resetTile(row, j);
-	//			}
-	//		}
-	//	}
-	//}
-	//catch (const std::exception& e)
-	//{
-	//	qDebug() << e.what();
-	//}
-
-	qDebug() << "Moving all lines down from row:" << i;
-
-	try {
-		// Zabezpieczenie dostêpu do planszy w razie potrzeby (mutex)
-		std::lock_guard<std::mutex> lock(boardMutex);
-
-		// Zaczynamy przesuwaæ kafelki z wiersza i do wiersza poni¿ej
-		for (int row = i; row > 0; row--) {
-			for (int j = 0; j < GAME_AREA_WIDTH; j++) {
-				// Jeœli kafelek w wierszu powy¿ej jest zajêty
-				if (gameArea[row - 1][j]->getIsOccupied()) {
-					// Przesuwamy kafelek w dó³
-					changeTileStatus(row, j, true);  // Zmieniamy status na zajêty
-					changeTile(row, j, gameArea[row - 1][j]->get_color());  // Przesuwamy kolor kafelka
-				}
-				else {
-					resetTile(row, j);  // Jeœli nie ma kafelka, resetujemy go
+	std::lock_guard<std::mutex> lock(boardMutex);
+	qDebug() << "Moving the lines. i:"<<i;
+	try
+	{
+		for (int row = i; row >= 0; row--) {
+			if (row - 1 < 0 || check_line_condition(row - 1, false)) {
+				delete_line(row);
+				break;
+			}
+			else {
+				for (int j = 0; j < GAME_AREA_WIDTH; j++) {
+					if (gameArea[row - 1][j]->getIsOccupied()) {
+						changeTileStatus(row, j, true);
+						changeTile(row, j, gameArea[row - 1][j]->get_color());
+					}
+					else resetTile(row, j);
 				}
 			}
 		}
 	}
-	catch (const std::exception& e) {
-		qDebug() << "Exception occurred while moving lines down: " << e.what();
+	catch (const std::exception& e)
+	{
+		qDebug() << e.what();
 	}
+
+	//qDebug() << "Moving all lines down from row:" << i;
+
+	//try {
+	//	std::lock_guard<std::mutex> lock(boardMutex);
+
+	//	for (int row = i; row > 0; row--) {
+	//		for (int j = 0; j < GAME_AREA_WIDTH; j++) {
+	//			if (gameArea[row - 1][j]->getIsOccupied()) {
+	//		
+	//				changeTileStatus(row, j, true);  
+	//				changeTile(row, j, gameArea[row - 1][j]->get_color());  
+	//			}
+	//			else {
+	//				resetTile(row, j); 
+	//			}
+	//		}
+	//	}
+	//}
+	//catch (const std::exception& e) {
+	//	qDebug() << "Exception occurred while moving lines down: " << e.what();
+	//}
 
 }
 
@@ -211,7 +209,7 @@ void board::check_board() {
 	}
 	NetworkMessage message = NetworkMessageFactory::createStopListenOnlyMeMessage(networkMessageManager->getLocalPlayer());
 	notifyOtherNetworkPlayers(message);
-	networkMessageManager->waitForMessage(message);
+	//networkMessageManager->waitForMessage(message);
 }
 
 void board::setNetworkMessageManager(NetworkMessageManager* networkMessageManagerVal) {
