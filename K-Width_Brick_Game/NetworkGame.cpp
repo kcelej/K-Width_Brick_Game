@@ -47,6 +47,7 @@ void NetworkGame::startGame() {
 	}
 	catch (std::exception e) {
 		qDebug() << e.what();
+		QMessageBox::warning(nullptr, "EXC", e.what());
 	}
 
 }

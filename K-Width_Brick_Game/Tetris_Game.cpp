@@ -18,6 +18,7 @@ Tetris_Game::Tetris_Game() {
 
     gameScene->addItem(backgroundImageItem);
     gameBoard = new board(gameScene);
+    gameBoard->setGameView(gameView);
 
     gameView->show();
     gameView->setFixedSize(gameWindowWidth, gameWindowHeight);
@@ -220,12 +221,18 @@ board* Tetris_Game::getBoard() {
 void Tetris_Game::freeze() {
     //std::mutex m;
     //m.lock();
+    gameView->setDisabled(true);
     gameFreezed = true;
     //m.unlock();
 }
 void Tetris_Game::unFreeze() {
     //std::mutex m;
     //m.lock();
+    gameView->setDisabled(false);
     gameFreezed = false;
     //m.unlock();
+}
+
+QGraphicsView* Tetris_Game::getGameView() {
+    return gameView;
 }

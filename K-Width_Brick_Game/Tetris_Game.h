@@ -18,7 +18,7 @@ public:
     ~Tetris_Game(); // Destructor for cleaning up resources
     void Game();    // Main game loop
     board* getBoard();
-
+    QGraphicsView* getGameView();
     void freeze();
     void unFreeze();
 

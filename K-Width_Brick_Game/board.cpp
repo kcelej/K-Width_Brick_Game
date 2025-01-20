@@ -92,11 +92,12 @@ void board::delete_line(int i) {
 }
 
 void board::move_all_down(int i) {
-	std::lock_guard<std::mutex> lock(boardMutex);
+	//std::lock_guard<std::mutex> lock(boardMutex);
 	qDebug() << "Moving the lines. i:"<<i;
 	try
 	{
 		for (int row = i; row >= 0; row--) {
+			qDebug() << "row nr " << row;
 			if (row - 1 < 0 || check_line_condition(row - 1, false)) {
 				delete_line(row);
 				break;
@@ -142,7 +143,67 @@ void board::move_all_down(int i) {
 }
 
 void board::check_board() {
-	qDebug() << "Checking the board.";
+	
+	//qDebug() << "Checking the board.";
+
+	//// Wyœlij wiadomoœæ, ¿e lokalny gracz chce przej¹æ kontrolê
+	//notifyOtherNetworkPlayers(NetworkMessageFactory::createListenOnlyMeMessage(networkMessageManager->getLocalPlayer()));
+
+	//// Oczekiwanie, a¿ wszyscy gracze bêd¹ s³uchaæ lokalnego gracza
+	//while (true) {
+	//	{
+	//		std::lock_guard<std::mutex> lock(boardMutex);
+
+	//		if (networkMessageManager->isEveryOneListenMe()) {
+	//			qDebug() << "Everyone is listening to me.";
+	//			break;
+	//		}
+	//		if (networkMessageManager->isListenOlnyOtherPlayer()) {
+	//			qDebug() << "Another player is listening. Exiting check_board.";
+	//			return;
+	//		}
+	//	}
+	//	QCoreApplication::processEvents(); 
+	//	std::this_thread::sleep_for(std::chrono::milliseconds(100)); 
+	//}
+
+	//for (int i = GAME_AREA_HEIGHT - 1; i >= 0; i--) {
+	//	qDebug() << "Checking row:" << i;
+
+	//	if (check_line_condition(i, true)) {
+	//		qDebug() << "Row " << i << " is fully occupied.";
+
+	//		try {
+	//
+	//			NetworkMessage message = NetworkMessageFactory::createCanRowBeDeletedMessage(
+	//				networkMessageManager->getLocalPlayer(), i, true
+	//			);
+
+	//
+	//			notifyOtherNetworkPlayers(message);
+
+	//	
+	//			networkMessageManager->waitForMessageFinish(message);
+
+	//			move_all_down(i);
+	//		}
+	//		catch (const std::exception& e) {
+	//			qDebug() << "Exception while processing row " << i << ": " << e.what();
+	//		}
+	//	}
+	//	else {
+	//		qDebug() << "Row " << i << " is not fully occupied.";
+	//	}
+	//}
+
+	//// Wyœlij wiadomoœæ, ¿e lokalny gracz koñczy kontrolê
+	//NetworkMessage message = NetworkMessageFactory::createStopListenOnlyMeMessage(networkMessageManager->getLocalPlayer());
+	//notifyOtherNetworkPlayers(message);
+
+	//qDebug() << "Finished checking the board.";
+
+	qDebug() << "\n\n\nChecking the board.";
+	gameView->setDisabled(true);
 	// Start checking from the bottom-most row and move upward.
 	notifyOtherNetworkPlayers(NetworkMessageFactory::createListenOnlyMeMessage(networkMessageManager->getLocalPlayer()));
 	while (true) {
@@ -179,8 +240,6 @@ void board::check_board() {
 			networkMessageManager->waitForMessageFinish(message);
 		}*/
 
-		qDebug() << "Entering row check for row:" << i;
-
 		if (check_line_condition(i, true)) {
 			qDebug() << "Condition met for row:" << i;
 
@@ -209,7 +268,9 @@ void board::check_board() {
 	}
 	NetworkMessage message = NetworkMessageFactory::createStopListenOnlyMeMessage(networkMessageManager->getLocalPlayer());
 	notifyOtherNetworkPlayers(message);
-	//networkMessageManager->waitForMessage(message);
+	networkMessageManager->waitForMessage(message);
+	gameView->setDisabled(false);
+	qDebug("checking board finished\n\n\n");
 }
 
 void board::setNetworkMessageManager(NetworkMessageManager* networkMessageManagerVal) {
@@ -225,4 +286,8 @@ void board::notifyOtherNetworkPlayers(NetworkMessage message) {
 
 void board::setLineStatus(int lineNumber, bool checked) {
 	linesStatus[lineNumber] = checked;
+}
+
+void board::setGameView(QGraphicsView* view) {
+	this->gameView = view;
 }

@@ -25,7 +25,7 @@ public:
     void stopWorking();
 
     void proceedMessageFromPrevious(const NetworkMessage& message);
-    void sendMessageToNext(const NetworkMessage& message);
+    void sendMessageToNext(const NetworkMessage message);
 
     void setLocalPlayer(const Player& localPlayer);
     Player getLocalPlayer();

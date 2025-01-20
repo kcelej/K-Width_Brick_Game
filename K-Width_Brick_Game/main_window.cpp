@@ -21,6 +21,7 @@ main_window::main_window(QWidget *parent)
 {
     ui.setupUi(this);
     symulateServerConfiguration();
+    setDisabled(true);
 }
 
 main_window::~main_window()

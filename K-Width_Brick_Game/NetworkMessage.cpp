@@ -6,6 +6,13 @@ NetworkMessage::NetworkMessage(const Player& sender, const QString& text, const 
     : sender(sender), text(text), sendTime(sendTime), typeOfMessage(type) {
 }
 
+NetworkMessage::NetworkMessage(const NetworkMessage& toCopy) {
+    this->sender = toCopy.sender;
+    this->sendTime = toCopy.sendTime;
+    this->text = toCopy.text;
+    this->typeOfMessage = toCopy.typeOfMessage;
+}
+
 Player NetworkMessage::getSender() const { return sender; }
 QString NetworkMessage::getText() const { return text; }
 QTime NetworkMessage::getSendTime() const { return sendTime; }
@@ -89,4 +96,12 @@ NetworkMessage::CanRowBeDeletedMessageInfo& NetworkMessage::CanRowBeDeletedMessa
 //text nie jest porownwywane
 bool NetworkMessage::operator==(const NetworkMessage& rv) const {
     return sender.getId() == rv.sender.getId() && sendTime == rv.sendTime && typeOfMessage == rv.typeOfMessage;
+}
+
+NetworkMessage& NetworkMessage::operator=(const NetworkMessage& rv) {
+    this->sender = rv.sender;
+    this->sendTime = rv.sendTime;
+    this->text = rv.text;
+    this->typeOfMessage = rv.typeOfMessage;
+    return *this;
 }

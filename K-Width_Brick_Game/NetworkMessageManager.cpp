@@ -108,10 +108,19 @@ void NetworkMessageManager::proceedMessageFromPrevious(const NetworkMessage& mes
     }
     lastFinishMessage = message;
     emit messageFinished(lastFinishMessage);
+    qDebug() << QString("Player id:%1 finish processing message. Message: sender:%2, message content:%3, sentTime:%4, typeOfMessage:%5")
+        .arg(localPlayer.getId())
+        .arg(message.getSender().getId())
+        .arg(message.getText())
+        .arg(message.getSendTime().toString())
+        .arg(message.getType());
 }
 
-void NetworkMessageManager::sendMessageToNext(const NetworkMessage& message) {
+void NetworkMessageManager::sendMessageToNext(const NetworkMessage message) {
+    std::mutex m;
+    m.lock();
     if (outputSocket && outputSocket->isWritable()) {
+        
         QByteArray data = message.toByteArray();
         outputSocket->write(data);
         outputSocket->flush();
@@ -125,6 +134,7 @@ void NetworkMessageManager::sendMessageToNext(const NetworkMessage& message) {
     else {
         qDebug() << "Output socket is not writable.";
     }
+    m.unlock();
 }
 
 void NetworkMessageManager::setLocalPlayer(const Player& localPlayerVal) {
@@ -139,6 +149,7 @@ Player NetworkMessageManager::getLocalPlayer() {
 void NetworkMessageManager::onReadyRead() {
     if (inputSocket && inputSocket->bytesAvailable() > 0) {
         QByteArray data = inputSocket->readAll();
+        qDebug() << "receved data: " << data.toStdString();
         NetworkMessage message = NetworkMessage::fromByteArray(data);
         proceedMessageFromPrevious(message);
     }
@@ -175,14 +186,21 @@ void NetworkMessageManager::serveCanRowBeDeletedMessage(const NetworkMessage& me
             }
         }
         if (areAllPlayersReadyToRemoveRow) {
+            qDebug("All players ready to remove line");
             game_board->delete_line(messsageInfo.numberOfRow);
+            qDebug("delete line");
             NetworkMessage deleteMessage = NetworkMessageFactory::createDeleteRowMessage(localPlayer, messsageInfo.numberOfRow);
             sendMessageToNext(deleteMessage);
-            //waitForMessage(deleteMessage);
+            qDebug("message sent");
+            waitForMessageFinish(deleteMessage);
+            qDebug("Wait for message delete");
             game_board->move_all_down(messsageInfo.numberOfRow);
+            qDebug("move all down");
             NetworkMessage moveAllDownMessage = NetworkMessageFactory::createMoveAllDownMessage(localPlayer, messsageInfo.numberOfRow);
             sendMessageToNext(moveAllDownMessage);
-           // waitForMessage(moveAllDownMessage);
+            qDebug("message sent");
+            waitForMessageFinish(moveAllDownMessage);
+            qDebug("Wait for messafe move all down");
         }
     }
 }
@@ -200,16 +218,21 @@ void NetworkMessageManager::serveMoveAllDownMessage(const NetworkMessage& messag
 }
 
 void NetworkMessageManager::serveListenOnlyMeMessage(const NetworkMessage& message) {
+    qDebug("serve listen only me");
     if (message.getSender().getId() != localPlayer.getId()) {
+        qDebug("\n\n\nserving listen only me message");
+        qDebug("diffrent id");
         if (isListenOnlyOnePlayer) {
-            if (!priorityMessageSendTime && (message.getSendTime() < *priorityMessageSendTime)) {
-                *priorityPlayer = message.getSender();
-                *priorityMessageSendTime = message.getSendTime();
-                sendMessageToNext(message);
-                game->freeze();
-            }
+            qDebug("is listening plyaer");
+            //if ((priorityMessageSendTime!=nullptr) && (message.getSendTime() < *priorityMessageSendTime)) {
+            //    *priorityPlayer = message.getSender();
+            //    *priorityMessageSendTime = message.getSendTime();
+            //    sendMessageToNext(message);
+            //    game->freeze();
+            //}
         }
         else {
+            qDebug("isnt listening player");
             priorityPlayer = new Player();
             priorityMessageSendTime = new QTime();
             *priorityPlayer = message.getSender();
@@ -226,10 +249,15 @@ void NetworkMessageManager::serveListenOnlyMeMessage(const NetworkMessage& messa
 
 }
 void NetworkMessageManager::serveStopListenOnlyMeMessage(const NetworkMessage& message) {
+    qDebug("stop listen me message");
     if (message.getSender().getId() != localPlayer.getId()) {
+        qDebug("\n\n\nserving stop listen only me message");
+        qDebug("diff id");
         isListenOnlyOnePlayer = false;
-        delete priorityMessageSendTime;
-        delete priorityPlayer;
+        if (priorityMessageSendTime != nullptr && priorityPlayer != nullptr) {
+            delete priorityMessageSendTime;
+            delete priorityPlayer;
+        }
         priorityMessageSendTime = nullptr;
         priorityPlayer = nullptr;
         game->unFreeze();
@@ -250,74 +278,112 @@ bool  NetworkMessageManager::isListenOlnyOtherPlayer() {
 }
 
 void NetworkMessageManager::waitForMessage(const NetworkMessage& message) {
-
     qDebug("wait for message beg");
-
-    QEventLoop loop;
-    bool messageMatched = false;
-
- 
-    connect(this, &NetworkMessageManager::messageReceived, this, [&](const NetworkMessage& receivedMessage) {
-        if (receivedMessage == message) {
-            messageMatched = true;
-            loop.quit(); 
-        }
-        });
-
-    QTimer timer;
-    timer.setSingleShot(true);
-    connect(&timer, &QTimer::timeout, &loop, [&]() {
-        qDebug("Timeout reached while waiting for message");
-        loop.quit();
-        });
-    timer.start(5000); 
-
-    loop.exec(); 
-
-    if (messageMatched) {
-        qDebug("Expected message received");
+    while (!(lastMessage == message)) {
+        QApplication::processEvents();
     }
-    else {
-        qDebug("Wait for message ended without receiving the expected message");
-    }
-
     qDebug("wait for message end");
+
+    //qDebug("wait for message beg");
+
+    //QEventLoop loop;
+    //bool messageMatched = false;
+
+    //connect(this, &NetworkMessageManager::messageReceived, this, [&](const NetworkMessage& receivedMessage) {
+    //    if (receivedMessage == message) {
+    //        messageMatched = true;
+    //        loop.quit();
+    //    }
+    //    });
+
+    //QTimer timer;
+    //timer.setSingleShot(true);
+    //connect(&timer, &QTimer::timeout, [&]() {
+    //    qDebug("Timeout reached while waiting for message");
+    //    loop.quit();
+    //    });
+    //timer.start(5000);
+
+    //while (!messageMatched && timer.isActive()) {
+    //    QCoreApplication::processEvents();  // Przetwarzaj zdarzenia w pêtli
+    //}
+
+    //if (messageMatched) {
+    //    qDebug("Expected message received");
+    //}
+    //else {
+    //    qDebug("Wait for message ended without receiving the expected message");
+    //}
+
+    //qDebug("wait for message end");
 }
 
 void NetworkMessageManager::waitForMessageFinish(const NetworkMessage& message) {
-
     qDebug("wait for message finish beg");
-
-    QEventLoop loop;
-    bool messageMatched = false;
-
-    auto connection = connect(this, &NetworkMessageManager::messageFinished, this, [&](const NetworkMessage& finishedMessage) {
-        if (finishedMessage == message) {
-            messageMatched = true;
-            loop.quit();
-        }
-        }, Qt::QueuedConnection);
-
-    QTimer timer;
-    timer.setSingleShot(true);
-    connect(&timer, &QTimer::timeout, [&]() {
-        qDebug("Timeout reached while waiting for message");
-        loop.quit();
-        });
-
-    timer.start(5000); 
-
-    loop.exec();
-
-    disconnect(connection);
-
-    if (messageMatched) {
-        qDebug("Expected message finished");
+    while (!(lastFinishMessage == message)) {
+        QThread::msleep(100);
+        QApplication::processEvents();
+        onReadyRead();
     }
-    else {
-        qDebug("Wait for message ended without receiving the expected message");
-    }
-
     qDebug("wait for message finish end");
+    //qDebug("wait for message finish beg");
+
+    //QEventLoop loop;
+    //bool messageMatched = false;
+
+    //QPointer<NetworkMessageManager> safeThis(this);
+
+    //auto connection = connect(this, &NetworkMessageManager::messageFinished, this, [&](const NetworkMessage& finishedMessage) {
+    //    if (!safeThis) {
+    //        qDebug("Object destroyed, exiting connection lambda");
+    //        return;
+    //    }
+
+    //    if (finishedMessage == message) {
+    //        messageMatched = true;
+    //        loop.quit();
+    //    }
+    //    }, Qt::QueuedConnection);
+
+    //QTimer timer;
+    //timer.setSingleShot(true);
+    //connect(&timer, &QTimer::timeout, [&]() {
+    //    qDebug("Timeout reached while waiting for message finish");
+    //    loop.quit();
+    //    });
+    //timer.start(5000);
+
+    //loop.exec();
+
+    //qDebug("Przetwarzam zdarzenia");
+    //while (!messageMatched && timer.isActive()) {
+    //    QCoreApplication::processEvents();  // Przetwarzaj zdarzenia w pêtli
+    //}
+    //qDebug("Koniec przetwarzania zdarzen");
+
+    //if (safeThis && connection) {
+    //    disconnect(connection);
+    //}
+
+    //if (messageMatched) {
+    //    qDebug("Expected message finished");
+    //    qDebug() << QString("Player id:%1 finished waiting for message. Message: sender:%2, message content:%3, sentTime:%4, typeOfMessage:%5")
+    //        .arg(localPlayer.getId())
+    //        .arg(message.getSender().getId())
+    //        .arg(message.getText())
+    //        .arg(message.getSendTime().toString())
+    //        .arg(message.getType());
+    //}
+    //else {
+    //    qDebug("Wait for message ended without receiving the expected message");
+    //    qDebug() << QString("Player id:%1 finished waiting for message. Message: sender:%2, message content:%3, sentTime:%4, typeOfMessage:%5")
+    //        .arg(localPlayer.getId())
+    //        .arg(message.getSender().getId())
+    //        .arg(message.getText())
+    //        .arg(message.getSendTime().toString())
+    //        .arg(message.getType());
+    //}
+
+    //qDebug("wait for message finish end");
 }
 

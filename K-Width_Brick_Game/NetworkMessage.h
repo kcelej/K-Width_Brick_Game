@@ -35,6 +35,7 @@ public:
 
     NetworkMessage(const Player& sender, const QString& text, const QTime& sendTime, NetworkMessageType type);
     NetworkMessage() = default;
+    NetworkMessage(const NetworkMessage& toCopy);
 
     Player getSender() const;
     QString getText() const;
@@ -44,6 +45,7 @@ public:
     static NetworkMessage fromByteArray(const QByteArray& data); // Deserializacja
 
     bool operator==(const NetworkMessage& rv) const;
+    NetworkMessage& operator=(const NetworkMessage& rv);
 
 private:
     Player sender;

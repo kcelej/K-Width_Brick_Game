@@ -3,6 +3,7 @@
 #include "tile.h"
 #include "NetworkMessageManager.h"
 #include <mutex>
+
 // GAME WINDOW DATA:
 const int gameWindowHeight = 480;	// height of the game window (in pixels)
 const int gameWindowWidth = 320;	// width of the game window (in pixels)
@@ -16,6 +17,7 @@ private:
 	bool linesStatus[GAME_AREA_HEIGHT];
 	void setLineStatus(int lineNumber, bool checked);
 	std::mutex boardMutex;
+	QGraphicsView* gameView;
 public:
 	tile* gameArea[GAME_AREA_HEIGHT][GAME_AREA_WIDTH];	// the game area is 20 tiles high and 10 tiles wide
 	board(QGraphicsScene* scene);
@@ -24,7 +26,7 @@ public:
 	bool isTileTaken(int i, int j);
 	void resetTile(int i, int j);
 	void changeTileStatus(int i, int j, bool b);
-
+	
 	/*
 	 * Checks whether a specific line in the game area meets a given condition (fully occupied or fully empty).
 	 *
@@ -61,6 +63,7 @@ public:
 	void check_board();
 
 	void setNetworkMessageManager(NetworkMessageManager* networkMessageManagerVal);
+	void setGameView(QGraphicsView*);
 
 	friend class tile;
 };

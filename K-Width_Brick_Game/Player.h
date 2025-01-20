@@ -13,6 +13,8 @@ public:
 
     void setIpAddress(const QString& ip);
     void setId(int id);
+    Player& operator=(const Player& rv);
+    Player(const Player& toCopy);
 
 private:
     QString ipAddress;
