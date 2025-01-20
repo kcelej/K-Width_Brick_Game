@@ -16,7 +16,7 @@ private:
     Ui::main_windowClass ui;
 
     //do testow, pozniej usunac
-    NetworkGame game;
+    NetworkGame* game;
     void symulateServerConfiguration();//symuluje +/- to co ma wykonac uzytkownik serwer przed rozpoczeciem gry
     // koniec zmian do usuniecia
 private slots:

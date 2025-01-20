@@ -9,6 +9,7 @@ Tetris_Game::Tetris_Game() {
     gameView = new Tetris_Game_View();
     gameView->setScene(gameScene);
     gameView->setWindowTitle("Brick Game");
+    gameView->hide();
 
     QPixmap backgroundImagePixmap(":/resources/textures/background.png");
     backgroundImageItem = new QGraphicsPixmapItem();
@@ -20,7 +21,6 @@ Tetris_Game::Tetris_Game() {
     gameBoard = new board(gameScene);
     gameBoard->setGameView(gameView);
 
-    gameView->show();
     gameView->setFixedSize(gameWindowWidth, gameWindowHeight);
     gameView->setHorizontalScrollBarPolicy(Qt::ScrollBarAlwaysOff);
     gameView->setVerticalScrollBarPolicy(Qt::ScrollBarAlwaysOff);
@@ -85,6 +85,7 @@ Tetris_Game::~Tetris_Game() {
 }
 
 void Tetris_Game::Game() {
+    gameView->show();
     bool game_ended = false; // Flag to indicate if the game has ended.
 
     int how_many = 1; // Temporary variable to limit the number of blocks spawned (for testing, remove later).
@@ -135,6 +136,7 @@ void Tetris_Game::Game() {
         QCoreApplication::processEvents();
     }
     qDebug() << "Game ended";
+    gameView->hide();
 }
 
 void Tetris_Game::waitForNextFrame(QElapsedTimer& timer, int frameDelay) {

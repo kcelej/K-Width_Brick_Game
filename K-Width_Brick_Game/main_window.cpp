@@ -20,12 +20,11 @@ main_window::main_window(QWidget *parent)
     : QMainWindow(parent)
 {
     ui.setupUi(this);
-    symulateServerConfiguration();
-    setDisabled(true);
 }
 
 main_window::~main_window()
 {
+    delete game;
 }
 
 //old
@@ -112,41 +111,63 @@ void main_window::on_testGameButton_clicked() {
 
 //new
 void main_window::on_testGameButton_clicked() {
-    Tetris_Game Tetris;
-    Tetris.Game();
+
+    symulateServerConfiguration();
 
    //idk
    return;
 }
 
 void main_window::symulateServerConfiguration() {
-    //do testow. symuluje to co ma skonfigurowac gracz serwer
-    //std::cout << "Uwaga brak walidacji!\n";
+    game = new NetworkGame();
+    // Get the listening port
+    bool ok = false;
+    int listeningPort = QInputDialog::getInt(this, "Server Configuration",
+        "Enter listening port:",
+        0, 0, 65535, 1, &ok);
+    if (!ok) return; // User canceled
 
-    int listeningPort = 0;
-    std::cout << "Enter listening port:\t";
-    std::cin >> listeningPort;
+    // Get the sending port
+    int sendingPort = QInputDialog::getInt(this, "Server Configuration",
+        "Enter sending port:",
+        0, 0, 65535, 1, &ok);
+    if (!ok) return;
 
-    int sendingPort = 0;
-    std::cout << "Enter sending port:\t";
-    std::cin >> sendingPort;
+    // Get the sending IP
+    QString sendingIP = QInputDialog::getText(this, "Server Configuration",
+        "Enter sending IP (v4):",
+        QLineEdit::Normal, "127.0.0.1", &ok);
+    if (!ok) return;
 
-    std::string sendingIP = "";
-    std::cout << "Enter sending ip (v4):\t";
-    std::cin >> sendingIP;
+    // Get the user ID
+    int userId = QInputDialog::getInt(this, "Server Configuration",
+        "Enter user ID:",
+        0, 0, 10000, 1, &ok);
+    if (!ok) return;
 
-    int userId = 0;
-    std::cout << "Enter user id:\t";
-    std::cin >> userId;
+    // Confirmation
+    QMessageBox::StandardButton confirm = QMessageBox::question(this,
+        "Confirm",
+        QString("Listening Port: %1\nSending Port: %2\nSending IP: %3\nUser ID: %4\nDo you confirm?")
+        .arg(listeningPort)
+        .arg(sendingPort)
+        .arg(sendingIP)
+        .arg(userId),
+        QMessageBox::Yes | QMessageBox::No);
 
-    std::cout << "Confirm (enter):\t";
-    std::cin.get();
-    std::cin.get();
+    if (confirm != QMessageBox::Yes) return;
 
-    game.setUserId(userId);
-    game.configNetworkNeighbors(sendingIP.c_str(), sendingPort, listeningPort);
-    game.startListening();
+    // Configure the game
+    game->setUserId(userId);
+    game->configNetworkNeighbors(sendingIP.toStdString().c_str(), sendingPort, listeningPort);
+    game->startListening();
+
+    // Delay for simulation
     QThread::msleep(5000);
-    game.connectToNext();
-    game.startGame();
+
+    // Connect to the next node and start the game
+    game->connectToNext();
+    hide();
+    game->startGame();
+    show();
 }
