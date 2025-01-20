@@ -121,26 +121,30 @@ void main_window::on_testGameButton_clicked() {
 
 void main_window::symulateServerConfiguration() {
     //do testow. symuluje to co ma skonfigurowac gracz serwer
-    std::cout << "Uwaga brak walidacji!\n";
+    //std::cout << "Uwaga brak walidacji!\n";
 
     int listeningPort = 0;
-    std::cout << "Podaj port do sluchania:\t";
+    std::cout << "Enter listening port:\t";
     std::cin >> listeningPort;
 
     int sendingPort = 0;
-    std::cout << "Podaj port do wysylania:\t";
+    std::cout << "Enter sending port:\t";
     std::cin >> sendingPort;
 
+    std::string sendingIP = "";
+    std::cout << "Enter sending ip (v4):\t";
+    std::cin >> sendingIP;
+
     int userId = 0;
-    std::cout << "Podaj user id:\t";
+    std::cout << "Enter user id:\t";
     std::cin >> userId;
 
-    std::cout << "Zatwierdz(dowolny klawisz):\t";
+    std::cout << "Confirm (enter):\t";
     std::cin.get();
     std::cin.get();
 
     game.setUserId(userId);
-    game.configNetworkNeighbors(NetworkUtils::getLocalHost(), sendingPort, listeningPort);
+    game.configNetworkNeighbors(sendingIP.c_str(), sendingPort, listeningPort);
     game.startListening();
     QThread::msleep(5000);
     game.connectToNext();

@@ -34,6 +34,7 @@ public:
     bool isListenOlnyOtherPlayer();
     void waitForMessage(const NetworkMessage& message);
     void waitForMessageFinish(const NetworkMessage& message);
+    void setPriorityMessageBeforeSendingListenOlnyMeMessage(const NetworkMessage& message);
 
 signals:
     void messageProcessed(const NetworkMessage& message);
@@ -56,6 +57,7 @@ private:
     bool isListenOnlyOnePlayer;
     QTime* priorityMessageSendTime;
     bool everyOneListenMe;
+    bool localPlayerSentListenOnlyMeMessage;
 
     Player localPlayer;
     QTcpServer* inputServer;  // Serwer do nasluchiwania na polaczenia przychodzace

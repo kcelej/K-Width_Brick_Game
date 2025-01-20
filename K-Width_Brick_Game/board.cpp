@@ -117,129 +117,30 @@ void board::move_all_down(int i) {
 	{
 		qDebug() << e.what();
 	}
-
-	//qDebug() << "Moving all lines down from row:" << i;
-
-	//try {
-	//	std::lock_guard<std::mutex> lock(boardMutex);
-
-	//	for (int row = i; row > 0; row--) {
-	//		for (int j = 0; j < GAME_AREA_WIDTH; j++) {
-	//			if (gameArea[row - 1][j]->getIsOccupied()) {
-	//		
-	//				changeTileStatus(row, j, true);  
-	//				changeTile(row, j, gameArea[row - 1][j]->get_color());  
-	//			}
-	//			else {
-	//				resetTile(row, j); 
-	//			}
-	//		}
-	//	}
-	//}
-	//catch (const std::exception& e) {
-	//	qDebug() << "Exception occurred while moving lines down: " << e.what();
-	//}
-
 }
 
 void board::check_board() {
 	
-	//qDebug() << "Checking the board.";
-
-	//// Wyœlij wiadomoœæ, ¿e lokalny gracz chce przej¹æ kontrolê
-	//notifyOtherNetworkPlayers(NetworkMessageFactory::createListenOnlyMeMessage(networkMessageManager->getLocalPlayer()));
-
-	//// Oczekiwanie, a¿ wszyscy gracze bêd¹ s³uchaæ lokalnego gracza
-	//while (true) {
-	//	{
-	//		std::lock_guard<std::mutex> lock(boardMutex);
-
-	//		if (networkMessageManager->isEveryOneListenMe()) {
-	//			qDebug() << "Everyone is listening to me.";
-	//			break;
-	//		}
-	//		if (networkMessageManager->isListenOlnyOtherPlayer()) {
-	//			qDebug() << "Another player is listening. Exiting check_board.";
-	//			return;
-	//		}
-	//	}
-	//	QCoreApplication::processEvents(); 
-	//	std::this_thread::sleep_for(std::chrono::milliseconds(100)); 
-	//}
-
-	//for (int i = GAME_AREA_HEIGHT - 1; i >= 0; i--) {
-	//	qDebug() << "Checking row:" << i;
-
-	//	if (check_line_condition(i, true)) {
-	//		qDebug() << "Row " << i << " is fully occupied.";
-
-	//		try {
-	//
-	//			NetworkMessage message = NetworkMessageFactory::createCanRowBeDeletedMessage(
-	//				networkMessageManager->getLocalPlayer(), i, true
-	//			);
-
-	//
-	//			notifyOtherNetworkPlayers(message);
-
-	//	
-	//			networkMessageManager->waitForMessageFinish(message);
-
-	//			move_all_down(i);
-	//		}
-	//		catch (const std::exception& e) {
-	//			qDebug() << "Exception while processing row " << i << ": " << e.what();
-	//		}
-	//	}
-	//	else {
-	//		qDebug() << "Row " << i << " is not fully occupied.";
-	//	}
-	//}
-
-	//// Wyœlij wiadomoœæ, ¿e lokalny gracz koñczy kontrolê
-	//NetworkMessage message = NetworkMessageFactory::createStopListenOnlyMeMessage(networkMessageManager->getLocalPlayer());
-	//notifyOtherNetworkPlayers(message);
-
-	//qDebug() << "Finished checking the board.";
-
+	
 	qDebug() << "\n\n\nChecking the board.";
 	gameView->setDisabled(true);
 	// Start checking from the bottom-most row and move upward.
-	notifyOtherNetworkPlayers(NetworkMessageFactory::createListenOnlyMeMessage(networkMessageManager->getLocalPlayer()));
+	NetworkMessage listenOnlyMeMessage = NetworkMessageFactory::createListenOnlyMeMessage(networkMessageManager->getLocalPlayer());
+	networkMessageManager->setPriorityMessageBeforeSendingListenOlnyMeMessage(listenOnlyMeMessage);
+	notifyOtherNetworkPlayers(listenOnlyMeMessage);
 	while (true) {
 		if (networkMessageManager->isEveryOneListenMe()) {
+			qDebug("every one listen me, break from check board");
 			break;
 		}
 		if (networkMessageManager->isListenOlnyOtherPlayer()) {
+			qDebug("listen other player, return from check board");
 			return;
 		}
 		QCoreApplication::processEvents();
 	}
-	//if(potwierdzone){}
-	//else if slcuha kogos innego return
 	for (int i = GAME_AREA_HEIGHT - 1; i >= 0; i--) {
-		// Continue checking the same row while it is completely filled.
-		//while (check_line_condition(i, true)) {
-		//	// The line is full and can be removed.
-		//	delete_line(i);
-		//	notifyOtherNetworkPlayers(NetworkMessageFactory::createDeleteRowMessage(networkMessageManager->getLocalPlayer(), i));
-		//	// Shift all lines above the deleted line one row down.
-		//	move_all_down(i);
-		//}
-		//jesli gracz lokalnie stwierdzi, ze moze usunac wiersz, to wysyla wiadomosc do inncyh z zapytaniem, czy inni tez moga
-	/*	if (check_line_condition(i, true)) {
-			if (linesStatus[i] == false) {
-			notifyOtherNetworkPlayers(NetworkMessageFactory::createCanRowBeDeletedMessage(networkMessageManager->getLocalPlayer(), i, true));
-				setLineStatus(i, true);
-			}
-		}*/
-		/*if (check_line_condition(i, true)) {
-
-			NetworkMessage message = NetworkMessageFactory::createCanRowBeDeletedMessage(networkMessageManager->getLocalPlayer(), i, true);
-			notifyOtherNetworkPlayers(message);
-			networkMessageManager->waitForMessageFinish(message);
-		}*/
-
+	
 		if (check_line_condition(i, true)) {
 			qDebug() << "Condition met for row:" << i;
 
