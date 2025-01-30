@@ -17,7 +17,8 @@
 #include "iostream"
 
 #include "PlayerNetworkConfig.h"
-const int MAX_PLAYERS = 2; // Player limit
+
+const int MAX_PLAYERS = 4; // Player limit
 
 main_window::main_window(QWidget *parent)
     : QMainWindow(parent), server(nullptr), socket(nullptr)
@@ -223,9 +224,13 @@ void main_window::updatePlayerList() {
     }
 
     // Sending the player list to everyone
-    QString playerListMessage = "PLAYERS:" + playerInfoList.join(";");
+    PlayerNetworkConfig& config = PlayerNetworkConfig::getInstance();
+    config.PLAYER_COUNT = clients.size() + 1; // Liczymy równie¿ hosta
+    QString playerListMessage = QString("PLAYERS:%1;COUNT:%2").arg(playerInfoList.join(";")).arg(config.PLAYER_COUNT);
+
     for (QTcpSocket* socket : std::as_const(clients)) {
         socket->write(playerListMessage.toUtf8());
+        socket->flush();
     }
 
     statusLabel->setText("Status: Connected players: " + QString::number(clients.size() + 1));
@@ -252,14 +257,27 @@ void main_window::readData() {
     QByteArray data = client->readAll();
     QString message = QString::fromUtf8(data);
 
+
+    PlayerNetworkConfig& config = PlayerNetworkConfig::getInstance();
     qDebug() << "Recieved data from client:" << client->peerAddress().toString() << "->" << message;
 
     if (message.startsWith("PLAYERS:")) {
-        // Updating player list
-        QStringList players = message.mid(8).split(";");
+        // Aktualizacja listy graczy
+        QStringList parts = message.split(";");
+        QStringList players = parts[0].mid(8).split(";");
+
         playerList->clear();
         for (const QString& player : players) {
             playerList->addItem(player);
+        }
+
+        // **Odczyt liczby graczy**
+        for (const QString& part : parts) {
+            if (part.startsWith("COUNT:")) {
+                config.PLAYER_COUNT = part.mid(6).toInt();
+                
+                qDebug() << "Ustawiono PLAYER_COUNT na:" << config.PLAYER_COUNT;
+            }
         }
     }
     if (message.startsWith("SERVER_FULL")) {
@@ -311,6 +329,10 @@ void main_window::startGame() {
         statusLabel->setText("Not enough players to start game!");
         return;
     }
+    PlayerNetworkConfig& config = PlayerNetworkConfig::getInstance();
+    config.PLAYER_COUNT = clients.size() + 1;
+    qDebug() << "Player count:" << config.PLAYER_COUNT;
+
     assignPortsAndIPs();
 
     statusLabel->setText("The game has started!");

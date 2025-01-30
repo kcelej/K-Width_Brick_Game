@@ -1,3 +1,5 @@
+
+
 #define GAME_AREA_HEIGHT 20
 #define GAME_AREA_WIDTH 10
 
@@ -8,4 +10,4 @@
 #define DIRECTION_DOWN 0
 #define DIRECTION_LEFT 1
 #define DIRECTION_RIGHT 2
-#define NUMBER_OF_PLAYERS 2
+//#define NUMBER_OF_PLAYERS 2

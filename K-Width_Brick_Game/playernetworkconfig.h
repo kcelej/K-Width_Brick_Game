@@ -11,6 +11,8 @@ public:
         return instance;
     }
     
+    int PLAYER_COUNT;
+
     int listenPort;
     int sendPort;
     QString sendIp;
@@ -22,10 +24,10 @@ public:
     int getSendPort() const { return sendPort; }
     QString getSendIp() const { return sendIp; }
 
-    static PlayerNetworkConfig& instance() {
+    /*static PlayerNetworkConfig& instance() {
         static PlayerNetworkConfig config;
         return config;
-    }
+    }*/
 
 private:
     PlayerNetworkConfig() = default;
