@@ -60,9 +60,9 @@ private:
     bool localPlayerSentListenOnlyMeMessage;
 
     Player localPlayer;
-    QTcpServer* inputServer;  // Serwer do nasluchiwania na polaczenia przychodzace
-    QTcpSocket* inputSocket;  // Polaczenie z poprzednim graczem
-    QTcpSocket* outputSocket; // Polaczenie z nastepnym graczem
+    QTcpServer* inputServer;  // Server for listening for incoming connections
+    QTcpSocket* inputSocket;  // Connection with previous player
+    QTcpSocket* outputSocket; // Connection with next player
     QString nextNeighborIP;
     quint16 nextNeighborPort;
     quint16 previousNeighborPort;

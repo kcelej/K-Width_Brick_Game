@@ -41,8 +41,8 @@ public:
     QString getText() const;
     QTime getSendTime() const;
     NetworkMessageType getType() const;
-    QByteArray toByteArray() const; // Serializacja
-    static NetworkMessage fromByteArray(const QByteArray& data); // Deserializacja
+    QByteArray toByteArray() const; // Serialization
+    static NetworkMessage fromByteArray(const QByteArray& data); // Deserialization
 
     bool operator==(const NetworkMessage& rv) const;
     NetworkMessage& operator=(const NetworkMessage& rv);
