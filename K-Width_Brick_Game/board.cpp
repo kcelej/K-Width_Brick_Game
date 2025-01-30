@@ -5,12 +5,16 @@
 board::board(QGraphicsScene* scene) {
 	int boardX = 28;
 	int boardY = 30;
+
+	// Create the game grid with tiles.
 	for (int i = 0; i < GAME_AREA_HEIGHT; i++) {
 		for (int j = 0; j < GAME_AREA_WIDTH; j++) {
 			tile* activeTile = new tile(boardX, boardY);
 			boardX += TILE_SIZE;
 
+			// Store the tile in the game board array.
 			gameArea[i][j] = activeTile;
+			// Add tile to the scene.
 			scene->addItem(activeTile->getPtr());
 		}
 		boardX = 28;
@@ -18,7 +22,6 @@ board::board(QGraphicsScene* scene) {
 	}
 
 }
-
 
 void board::changeTile(int i, int j, int color) {
 	if (i >= 0 && i < GAME_AREA_HEIGHT && j >= 0 && j < GAME_AREA_WIDTH && gameArea[i][j] != nullptr) {
@@ -47,7 +50,6 @@ void board::changeTileStatus(int i, int j, bool b) {
 	gameArea[i][j]->changeTileStatus(b);
 }
 
-//fix needed?
 void board::resetTile(int i, int j) {
 	if (i >= 0 && i < GAME_AREA_HEIGHT && j >= 0 && j < GAME_AREA_WIDTH && gameArea[i][j] != nullptr) {
 		QPixmap tileset(":/resources/textures/empty_tile.png");
@@ -67,16 +69,13 @@ void board::resetTile(int i, int j) {
 }
 
 bool board::check_line_condition(int i, bool check_for_occupied) {
-	//qDebug() << "Checking the line with condition:" << (check_for_occupied ? "Occupied" : "Empty");
 	for (int j = 0; j < GAME_AREA_WIDTH; j++) {
 		bool is_occupied = gameArea[i][j]->getIsOccupied();
 		if (check_for_occupied && !is_occupied) {
-			//qDebug() << "The line contains blanks.";
-			return false; // The line is not fully occupied.
+			return false; // The line contains empty spaces.
 		}
 		if (!check_for_occupied && is_occupied) {
-			//qDebug() << "The line contains bricks.";
-			return false; // The line is not fully empty.
+			return false; // The line contains bricks.
 		}
 	}
 	qDebug() << (check_for_occupied ? "Full line occupied." : "Full line empty.");
@@ -120,8 +119,6 @@ void board::move_all_down(int i) {
 }
 
 void board::check_board() {
-	
-	
 	qDebug() << "\n\n\nChecking the board.";
 	gameView->setDisabled(true);
 	// Start checking from the bottom-most row and move upward.

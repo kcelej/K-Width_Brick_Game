@@ -14,12 +14,46 @@ class Tetris_Game : public QWidget {
     Q_OBJECT
 
 public:
-    Tetris_Game();  // Constructor for the Tetris_Game class
-    ~Tetris_Game(); // Destructor for cleaning up resources
-    void Game();    // Main game loop
+    /*
+     * Constructor for the Tetris_Game class.
+     * @details Initializes the game components, including the scene, view, game board, and background.
+     *          It also sets up the game window properties and connects the keyboard input from
+     *          `Tetris_Game_View` to the game's movement handler.
+     */
+    Tetris_Game();
+
+    /*
+     * Destructor for the Tetris_Game class.
+     * @details Cleans up dynamically allocated memory to prevent memory leaks.
+     */
+    ~Tetris_Game();
+
+    /*
+     * Starts the Tetris game loop.
+     * @details Controls the game flow, handling brick movement, collision detection, and board updates.
+     */
+    void Game();
+
+    /*
+     * Retrieves a pointer to the game board.
+     * @return Pointer to the game board.
+     */
     board* getBoard();
+
+    /*
+     * Retrieves a pointer to the game view.
+     * @return Pointer to the game view.
+     */
     QGraphicsView* getGameView();
+
+    /*
+     * Freezes the game, preventing player movement.
+     */
     void freeze();
+
+    /*
+     * Unfreezes the game, allowing player movement.
+     */
     void unFreeze();
 
 private:
@@ -30,42 +64,37 @@ private:
     board* gameBoard = nullptr;                       // Pointer to the game board object
     brick* player = nullptr;                          // Pointer to the current player brick (falling piece)
 
+    /*
+     * Waits for the next frame to maintain a consistent frame rate.
+     * @param timer Reference to QElapsedTimer to measure time elapsed since the last frame.
+     * @param frameDelay The delay (in milliseconds) between frames to achieve the desired FPS.
+     */
     void waitForNextFrame(QElapsedTimer& timer, int frameDelay);
 
     /*
-     * Handles the end of life for the current brick by deleting it and cleaning up resources.
-     * @details This method checks if a brick object (`player`) currently exists in the game.
-     *          If a brick is present, it deletes the brick and sets the pointer to `nullptr`,
-     *          effectively removing the brick from the game and freeing up memory.
-     *          If no brick is found, it logs a message indicating that no brick was available to delete.
-     * @note This function ensures that memory leaks are prevented by properly managing
-     *       the lifecycle of the dynamically allocated brick object.
+     * Deletes the current brick.
+     * @details If a brick exists, it is deleted, and the pointer is reset to avoid dangling references.
      */
     void end_of_life_of_brick();
 
     /*
-     * Adds a new brick to the game if one does not already exist.
-     * @details This method checks if the `player` (the current brick) is `nullptr`. If it is,
-     *          a new `brick` object is created using random shape and colour. After the brick is added, a debug message is logged indicating
-     *          that a new brick has been added.
-     *          If a brick already exists, a message is logged indicating that a new brick cannot be added.
+     * Adds a new brick to the game.
+     * @details A new brick is created if no active brick exists. The brick's properties are randomized.
      */
     void add_new_brick();
 
     /*
-     * Places the current brick on the game board, updating the board's state.
-     * Checks if the brick has caused a defeat condition before placing it.
-     * If the brick is successfully placed, its tiles are marked on the board with the appropriate color and status.
-     *
-     * @param game_ended A reference to a boolean that indicates whether the game has ended.
-     *                   This is set to true if the brick is positioned above the board's top boundary.
+     * Places the current brick on the board and checks for game over.
+     * @param game_ended Reference to the game-over flag.
      */
     void place_brick(bool& game_ended);
 
-    void moveLeft();
-    void moveRight();
-    void moveDown();
-    void rotateBrick();
-
-    void move(QKeyEvent* event) { player->movement(event); }
+    /*
+     * Handles keyboard input and passes it to the active brick.
+     * @details This function receives a key event from `Tetris_Game_View` 
+     *          and forwards it to the `player` object, allowing the brick to move accordingly.
+     *          If no active player exists, a warning is logged to prevent errors.
+     * @param event A pointer to the `QKeyEvent` containing key press details.
+     */
+    void move(QKeyEvent* event);
 };

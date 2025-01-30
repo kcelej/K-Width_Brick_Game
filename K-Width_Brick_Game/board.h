@@ -8,63 +8,101 @@
 const int gameWindowHeight = 480;	// height of the game window (in pixels)
 const int gameWindowWidth = 320;	// width of the game window (in pixels)
 
-
-class board
-{
+/*
+ * Represents the game board for a Tetris-like game.
+ * @details The board is a grid of tiles where the bricks are placed.
+ *          It handles tile updates, row clearing, and movement logic.
+ *          The class also integrates network messaging for multiplayer functionality.
+ */
+class board {
 private:
 	NetworkMessageManager* networkMessageManager = nullptr;
 	void notifyOtherNetworkPlayers(NetworkMessage message);
 	bool linesStatus[GAME_AREA_HEIGHT];
 	void setLineStatus(int lineNumber, bool checked);
 	std::mutex boardMutex;
-	QGraphicsView* gameView;
+	/// Pointer to the graphical view displaying the board.
+	QGraphicsView* gameView = nullptr;
 public:
-	tile* gameArea[GAME_AREA_HEIGHT][GAME_AREA_WIDTH];	// the game area is 20 tiles high and 10 tiles wide
+	/*
+	 * Represents the game grid.
+	 * The game board consists of `GAME_AREA_HEIGHT` rows and `GAME_AREA_WIDTH` columns.
+	 * Each cell is a pointer to a `tile` object.
+	 */
+	tile* gameArea[GAME_AREA_HEIGHT][GAME_AREA_WIDTH];
+	
+	/*
+	 * Constructor for the `board` class.
+	 * @details Initializes the game board by creating a grid of tiles and adding them to the scene.
+	 * @param scene Pointer to the QGraphicsScene where the tiles are displayed.
+	 */
 	board(QGraphicsScene* scene);
 
+	/*
+	 * Changes the color of a specific tile on the board.
+	 * @param i Row index of the tile.
+	 * @param j Column index of the tile.
+	 * @param color The new color index to apply.
+	 */
 	void changeTile(int i, int j, int color);
+
+	/*
+	 * Checks if a specific tile is occupied.
+	 * @param i Row index of the tile.
+	 * @param j Column index of the tile.
+	 * @return `true` if the tile is occupied, `false` otherwise.
+	 */
 	bool isTileTaken(int i, int j);
+
+	/*
+	 * Resets a tile to its default empty state.
+	 * @param i Row index of the tile.
+	 * @param j Column index of the tile.
+	 */
 	void resetTile(int i, int j);
+
+	/*
+	 * Changes the occupancy status of a tile.
+	 * @param i Row index of the tile.
+	 * @param j Column index of the tile.
+	 * @param b `true` if the tile is occupied, `false` if it is empty.
+	 */
 	void changeTileStatus(int i, int j, bool b);
 	
 	/*
-	 * Checks whether a specific line in the game area meets a given condition (fully occupied or fully empty).
-	 *
-	 * @param i The index of the line (row) to check in the game area.
-	 * @param check_for_occupied A boolean that determines the condition to check:
-	 *                           - true: Checks if the line is fully occupied.
-	 *                           - false: Checks if the line is fully empty.
-	 * @return Returns true if the line satisfies the specified condition; false otherwise.
+	 * Checks if a line is fully occupied or fully empty.
+	 * @param i Row index to check.
+	 * @param check_for_occupied If `true`, checks if the row is fully occupied. If `false`, checks if it is fully empty.
+	 * @return `true` if the condition is met, `false` otherwise.
 	 */
 	bool check_line_condition(int i, bool check_for_occupied);
 
 	/*
-	 * Deletes all tiles in a specific line (row) of the game area.
-	 * @param i The index of the line (row) to delete in the game area.
-	 *        All tiles in this line will have their status changed to unoccupied.
+	 * Deletes a full row by resetting all its tiles.
+	 * @param i The index of the row to delete.
 	 */
 	void delete_line(int i);
 
 	/*
-	 * Moves all rows on the board down starting from a specified row.
-	 * This process shifts the contents of rows downward, effectively clearing the specified row and replacing it with the contents of the row above.
-	 * If there is no row above (at the top of the board), the current row is deleted.
-	 *
-	 * @param i The index of the starting row from which to begin shifting rows downward.
-	 *          All rows from this index up to the top of the board are affected.
+	 * Moves all rows above the given row down by one position.
+	 * @param i The row index where the shift begins.
 	 */
 	void move_all_down(int i);
 
 	/*
-	 * Checks the entire game board for fully occupied lines and removes them.
-	 * Lines are processed from the bottom to the top of the board.
-	 * If a line is fully occupied, it is deleted, and all lines above it are shifted down.
+	 * Checks the board for completed rows and processes them accordingly.
 	 */
 	void check_board();
 
 	void setNetworkMessageManager(NetworkMessageManager* networkMessageManagerVal);
+
+	/*
+	 * Sets the game view reference.
+	 * @param view Pointer to the QGraphicsView associated with the board.
+	 */
 	void setGameView(QGraphicsView*);
 
+	/// Grants the `tile` class access to private members of `board`.
 	friend class tile;
 };
 
