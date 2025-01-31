@@ -91,7 +91,7 @@ void Tetris_Game::Game() {
 
                 if (frameCounter++ >= 60) {
                    // Move brick down every 60 frames (~1s).
-                    player->can_be_still_moved = player->move_down(); // Move the block down by one step.
+                   player->move_down(); // Move the block down by one step.
                    frameCounter = 0; // Reset the frame counter.
                 }
 
