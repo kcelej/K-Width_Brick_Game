@@ -63,6 +63,10 @@ void main_window::setupNetworkMenu() {
     layout->addWidget(startGameButton);
     connect(startGameButton, &QPushButton::clicked, this, &main_window::startGame);
 
+    singleplayerGameButton = new QPushButton("Singleplayer", this);
+    layout->addWidget(singleplayerGameButton);
+    connect(singleplayerGameButton, &QPushButton::clicked, this, &main_window::singleplayer);
+
     statusLabel = new QLabel("Status: Waiting", this);
     layout->addWidget(statusLabel);
 
@@ -74,19 +78,34 @@ QString main_window::getHostIpAddress() const {
     return hostIp;
 }
 
-void main_window::startServer() {
-    int port = portInput->text().toInt();
-    hostIp = ipInput->text().trimmed();
-    
-    startGameButton->setEnabled(true);
-
+void main_window::singleplayer() {
     PlayerNetworkConfig& config = PlayerNetworkConfig::getInstance();
-    config.hostport = port;
+    config.hostport = 15550;
+    hostIp = "127.0.0.1";
+    startServer();
+    startGame();
+
+}
+
+void main_window::startServer() {
+    PlayerNetworkConfig& config = PlayerNetworkConfig::getInstance();
+    qDebug() << "\nPortInput:\n" << portInput << "'"  ;
+    qDebug() << "\nIpInput:\n" << ipInput << "'";
+    
+    if (!portInput->text().isEmpty() && !ipInput->text().isEmpty()) {
+        config.hostport = portInput->text().toInt();
+        hostIp = ipInput->text().trimmed();
+
+       
+    }
+    qDebug() << "\nIpHosta:\n" << hostIp << "'";
+    startGameButton->setEnabled(true);
     server = new QTcpServer(this);
     connect(server, &QTcpServer::newConnection, this, &main_window::handleNewConnection);
 
-    if (server->listen(QHostAddress::Any, port)) {
-        statusLabel->setText("Status: Hosting on " + hostIp + ":" + QString::number(port));
+    if (server->listen(QHostAddress::Any, config.hostport)) {
+        statusLabel->setText("Status: Hosting on " + hostIp + ":" + QString::number(config.hostport));
+        qDebug() << "\nIpHosta:\n" << hostIp << "'";
         updatePlayerList();
     }
     else {
@@ -158,7 +177,7 @@ void main_window::updatePlayerList() {
 }
 
 void main_window::connectToHost() {
-    QString ip = ipInput->text();
+    QString ip = ipInput->text().trimmed();
     int port = portInput->text().toInt();
     socket = new QTcpSocket(this);
     connect(socket, &QTcpSocket::connected, this, &main_window::onConnected);
@@ -286,7 +305,7 @@ void main_window::assignPortsAndIPs() {
     QMap<int, QString> playerIps;
 
     playerIds.append(1);
-    playerIps[1] = QHostAddress(ipInput->text().trimmed()).toString();
+    playerIps[1] = hostIp;
 
     int currentId = 2;
     for (QTcpSocket* socket : clients) {
@@ -318,7 +337,7 @@ void main_window::assignPortsAndIPs() {
 
         assignedData.append(info);
     }
-
+    qDebug() << "\nIpHosta:\n" << hostIp << "'";
     // **Updating configuration for host (player ID 1)**
     
     config.playerId = assignedData[0].playerId;

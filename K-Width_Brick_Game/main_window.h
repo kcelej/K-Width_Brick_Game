@@ -40,6 +40,7 @@ private:
     QPushButton* hostButton;
     QPushButton* joinButton;
     QPushButton* startGameButton;
+    QPushButton* singleplayerGameButton;
     QLabel* statusLabel;
     QListWidget* playerList;
 
@@ -65,6 +66,7 @@ private slots:
     void readData();
     void startGame();
     void assignPortsAndIPs();
+    void singleplayer();
 };
 
 class GameInfoWindow : public QDialog {
