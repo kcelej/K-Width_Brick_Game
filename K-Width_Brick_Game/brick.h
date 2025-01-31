@@ -172,12 +172,6 @@ public:
 	bool collision (int direction) const;
 
 	/*
-	 * Moves the brick down if possible.
-	 * @return `true` if the brick was moved, `false` if it hit an obstacle.
-	 */
-	bool move_down();
-
-	/*
 	 * Checks if the brick has exceeded the upper boundary of the board, causing a game-over condition.
 	 * @return `true` if the game is lost, `false` otherwise.
 	 */
@@ -194,6 +188,8 @@ public:
 
 	// Checks if a tile is present in the shape.
 	bool get_tile_presence(const int tile) const { return shapes[shape][tile]; }
+
+	void move_down_by_game();
 private:
 	// The color of the brick.
 	int color;
@@ -270,6 +266,12 @@ private:
 	 * Increments the rotation index, cycling between 0 and 3.
 	 */
 	void increment_rotation();
+
+	/*
+	 * Moves the brick down if possible.
+	 * @return `true` if the brick was moved, `false` if it hit an obstacle.
+	 */
+	bool move_down();
 
 	/*
 	 * Moves the brick to the left if possible.

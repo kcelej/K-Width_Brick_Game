@@ -62,6 +62,12 @@ void brick::movement(QKeyEvent* event) {
 	draw();
 }
 
+void brick::move_down_by_game() {
+	reset_entire_brick();
+	can_be_still_moved = move_down();
+	draw();
+}
+
 void brick::change_rotation() {
 	int old_rotation = rotation;
 	increment_rotation();
