@@ -77,6 +77,8 @@ QString main_window::getHostIpAddress() const {
 void main_window::startServer() {
     int port = portInput->text().toInt();
     hostIp = ipInput->text().trimmed();
+    
+    startGameButton->setEnabled(true);
 
     PlayerNetworkConfig& config = PlayerNetworkConfig::getInstance();
     config.hostport = port;
@@ -152,7 +154,7 @@ void main_window::updatePlayerList() {
     }
 
     statusLabel->setText("Status: Connected players: " + QString::number(clients.size() + 1));
-    startGameButton->setEnabled(!clients.isEmpty());
+    //startGameButton->setEnabled(!clients.isEmpty());
 }
 
 void main_window::connectToHost() {
@@ -243,10 +245,10 @@ void main_window::readData() {
 }
 
 void main_window::startGame() {
-    if (clients.isEmpty()) {
+    /*if (clients.isEmpty()) {
         statusLabel->setText("Not enough players to start game!");
         return;
-    }
+    }*/
     PlayerNetworkConfig& config = PlayerNetworkConfig::getInstance();
     config.PLAYER_COUNT = clients.size() + 1;
     qDebug() << "Player count:" << config.PLAYER_COUNT;
